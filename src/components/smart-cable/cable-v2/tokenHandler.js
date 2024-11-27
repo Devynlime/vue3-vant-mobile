@@ -1,4 +1,5 @@
-import request from '@/utils/request-prod'
+import request from '@/utils/request'
+import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 
 // 登录方法
 export function login(username, password, code, uuid) {
@@ -20,14 +21,12 @@ export function login(username, password, code, uuid) {
 const username = 'admin'
 const password = 'Cable@2024'
 
-export function mockLogin() {
-  return new Promise((resolve, reject) => {
+export const mockLogin = () => {
     login(username, password, 'code', 'uuid').then((res) => {
       const data = res.data
-      localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem(STORAGE_TOKEN_KEY, data.access_token)
       resolve()
     }).catch((error) => {
       reject(error)
     })
-  })
 }

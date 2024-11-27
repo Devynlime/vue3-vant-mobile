@@ -4,7 +4,7 @@ import EchartMap from '@/components/smart-cable/dev-overview/EchartMap.vue'
 import { transformerSubstationIcon } from '@/components/icon'
 import { onMounted, ref } from 'vue'
 import { cableStatistic, channelStatistic, feederLineStatistic, substationStatistic } from '@/api/device-overview'
-import { mockLogin } from '@/utils/cable-v2/tokenHandler'
+import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler'
 
 const props = defineProps({
   display: String,
@@ -243,8 +243,8 @@ const cableStatisticItems = ref([
 
 <template>
   <div class="do-page-main">
-    <div style="height:100%;display: flex;flex-direction: row;">
-      <div v-if="props.display === 'left'" class="left-list">
+    <div class="content-container">
+      <div v-if="props.display === 'left'" class="side-panel left-panel">
         <div class="transparent-content">
           <div class="list-content" style="padding-top:15px;">
             <div
@@ -388,12 +388,12 @@ const cableStatisticItems = ref([
           </div>
         </div>
       </div>
-      <div v-if="props.display === 'center'" class="center-list">
+      <div v-if="props.display === 'center'" class="center-panel">
         <div class="transparent-content">
           <EchartMap />
         </div>
       </div>
-      <div v-if="props.display === 'right'" class="right-list">
+      <div v-if="props.display === 'right'" class="side-panel right-panel">
         <div class="transparent-content">
           <div class="list-content">
             <div class="statisticPieChart_cable" />
@@ -503,49 +503,32 @@ const cableStatisticItems = ref([
 }
 
 .do-page-main {
-  /* background-color: #ececec; */
-  /* padding: 8px; */
   height: 100%;
-  width: 100vw;
+  width: 100%;
+  overflow: hidden;
 }
 
-.right-list {
-  width: 100vw;
+.content-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.side-panel {
+  width: 400px;
   height: 90vh;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
-.left-list {
-  width: 100vw;
-  margin-right: 4px;
+.center-panel {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-}
-
-.center-list {
-  /* margin-right: 4px; */
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.list-content {
-  background-color: #fff;
-  border-radius: 4px;
-  align-self: stretch;
   overflow: hidden;
-  border: 1px solid #ccc;
-  padding: 5px 10px 5px 10px;
-  margin-bottom: 2px;
-  width: 100%;
-  /* height: max-content; */
-}
-
-.list-content:first-child {
-  min-height: 308px;
 }
 
 .transparent-content {
@@ -553,7 +536,7 @@ const cableStatisticItems = ref([
   flex-direction: column;
   align-items: stretch;
   overflow: hidden;
-  width: 100vw;
+  width: 100%;
   padding: 10px;
   margin-bottom: 2px;
   height: 100%;

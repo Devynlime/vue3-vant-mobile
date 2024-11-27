@@ -1,4 +1,5 @@
-import request from '@/utils/request-prod'
+import request from '@/utils/request'
+// import request from '@/utils/request-prod'
 // import requestDev from '@/utils/request-dev'
 
 /**

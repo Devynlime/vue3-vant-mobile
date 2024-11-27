@@ -20,9 +20,10 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       port: 3000,
       proxy: {
         '/api': {
-          target: 'https://easyapi.devv.zone/api',
+          target: env.VITE_APP_BASE_URL_PROD,
           ws: false,
           changeOrigin: true,
+          rewrite: path => path.replace(/^\/api/, ''),
         },
       },
     },

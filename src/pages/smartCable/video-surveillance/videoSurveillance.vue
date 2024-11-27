@@ -4,7 +4,7 @@ import { getVideoToken } from '@/api/video-api'
 import { Search } from '@element-plus/icons-vue'
 import { searchManagementChannelList } from '@/api/management-channel'
 import VideoFrame from '@/components/smart-cable/videoFrame.vue'
-import { mockLogin } from '@/utils/cable-v2/tokenHandler.js'
+import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler.js'
 
 const fullContent = ref(false)
 const videoUrl = ref('')

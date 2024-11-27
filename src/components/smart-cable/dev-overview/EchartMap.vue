@@ -12,15 +12,22 @@
 
 <script setup>
 import * as echarts from 'echarts';
-import { onMounted } from 'vue';
+import { onMounted, onUnmounted, nextTick } from 'vue';
 
 var option;
+let mapchart;
+
 const loadmap = (jsonfile) => {
     let domMap = document.querySelector(".mapcontainer")
     domMap.removeAttribute("_echarts_instance_");
-    var mapchart = echarts.init(domMap);
-    mapchart.showLoading();
-    fetch('./assets/data/' + jsonfile + "_full.json").then(res => {
+
+    domMap.style.width = '100%';
+    domMap.style.height = '75vh';
+
+    nextTick(() => {
+        mapchart = echarts.init(domMap);
+        mapchart.showLoading();
+        fetch('./assets/data/' + jsonfile + "_full.json").then(res => {
         return res.json()
     }).then(data => {
         echarts.registerMap('mapdata', data);
@@ -76,28 +83,43 @@ const loadmap = (jsonfile) => {
                         }
                     ]
                 }
-            );
+                )
+            })
         })
     })
 }
 
+const handleResize = () => {
+    if (mapchart) {
+        mapchart.resize();
+    }
+}
+
 onMounted(() => {
-    loadmap('650100')
+    loadmap('650100');
+    window.addEventListener('resize', handleResize);
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+    if (mapchart) {
+        mapchart.dispose();
+    }
 })
 </script>
 
 <style scoped lang="less">
 .containerdiv {
     width: 100%;
-    height: calc(85vh);
+    height: 100%;
     border: 1px solid #138D75;
     position: relative;
     border-radius: 5px;
 }
 
 .mapcontainer {
-    width: 100vw;
-    height: calc(88vh);
+    width: 100%;
+    height: 100%;
 }
 
 .labelinfo {

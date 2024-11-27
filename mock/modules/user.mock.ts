@@ -3,7 +3,7 @@ import { builder } from '../util'
 
 export default defineMock([
   {
-    url: '/api/auth/login',
+    url: '/mock/auth/login',
     delay: 500,
     body: () => {
       return {
