@@ -190,9 +190,14 @@ function handleVideoFrame() {
         </div>
       </div>
       <!-- 弹出层 -->
-      <van-dialog v-model:show="showVideoDialog" title="视频监控" show-cancel-button>
-        <!-- <VideoFrame :refName="video.ref" :videoUrl="video.url" /> -->
-        111
+      <van-dialog 
+        v-model:show="showVideoDialog" 
+        title="视频监控" 
+        :show-cancel-button="true"
+      >
+        <template #default>
+          <VideoFrame :ref-name="videoFrames[0].ref" :video-url="videoFrames[0].url" />
+        </template>
       </van-dialog>
     </div>
   </main>

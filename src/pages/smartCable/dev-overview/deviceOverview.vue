@@ -570,3 +570,11 @@ const cableStatisticItems = ref([
   width: 75px;
 }
 </style>
+<route lang="json">
+    {
+        "name":"deviceOverview",
+        "meta":{
+            "title":"电缆井设备概况"
+        }
+}
+</route>

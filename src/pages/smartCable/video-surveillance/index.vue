@@ -11,8 +11,6 @@ const tabs = [
 </script>
 
 <template>
-  <van-nav-bar title="电缆井运维监控平台" />
-
   <van-tabs v-model:active="active">
     <van-tab v-for="(tab, index) in tabs" :title="tab.title">
       <!-- {{ tab.title }} -->
@@ -23,5 +21,11 @@ const tabs = [
   <floatingBall />
 </template>
 
-<style>
-</style>
+<route lang="json">
+{
+    "name":"videoSurveillance",
+    "meta":{
+        "title":"电缆井运维监控平台"
+    }
+}
+</route>

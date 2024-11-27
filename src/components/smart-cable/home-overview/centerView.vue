@@ -1,35 +1,8 @@
 <template>
     <el-row :gutter="0">
         <el-col>
-            <div class= "w-100%">
-                <div class="mapcontainer"> </div>
-
-                <div class="labelinfo labelinfo-left-top">
-                    <div>220KV变电站: <span class="highlight-values">{{ leftTopInfo.numStation }}</span> 座</div>
-                    <div>容量: <span class="highlight-values">{{ leftTopInfo.capacity }}</span> MVA</div>
-                    <!-- <br>
-                    <div>其中10kv电缆线路:</div>
-                    <div>数量: <span class="highlight-values">{{ leftTopInfo.numCable }}</span> 条</div>
-                    <div>长度: <span class="highlight-values">{{ leftTopInfo.lenthCable }}</span> km</div> -->
-                </div>
-
-                <div class="labelinfo labelinfo-right-top">
-                    <div>110KV变电站: <span class="highlight-values">{{ rightTopInfo.numStation }}</span> 座</div>
-                    <div>容量: <span class="highlight-values">{{ rightTopInfo.capacity }}</span> MVA</div>
-                    <!-- <br>
-                    <div>其中10kv电缆线路:</div>
-                    <div>数量: <span class="highlight-values">{{ rightTopInfo.numCable }}</span> 条</div>
-                    <div>长度: <span class="highlight-values">{{ rightTopInfo.lenthCable }}</span> km</div> -->
-                </div>
-
-                <div class="labelinfo labelinfo-left-bottom">
-                    <div>35KV变电站: <span class="highlight-values">{{ leftBottomInfo.numStation }}</span> 座</div>
-                    <div>容量: <span class="highlight-values">{{ leftBottomInfo.capacity }}</span> MVA</div>
-                    <!-- <br>
-                    <div>其中10kv电缆线路:</div>
-                    <div>数量: <span class="highlight-values">{{ leftBottomInfo.numCable }}</span> 条</div>
-                    <div>长度: <span class="highlight-values">{{ leftBottomInfo.lenthCable }}</span> km</div> -->
-                </div>
+            <div class="w-full">
+                <div class="mapcontainer"></div>
             </div>
         </el-col>
 
@@ -64,122 +37,10 @@
 </template>
 <script setup>
 import * as echarts from 'echarts';
-import { onMounted, reactive, ref, onUnmounted } from 'vue';
+import { onMounted, reactive, ref, onUnmounted, nextTick, watch } from 'vue';
 import { overviewStatistic } from '@/api/device-overview'
 
-var option;
-
-const loadmap = (jsonfile) => {
-    let domMap = document.querySelector(".mapcontainer")
-    domMap.removeAttribute("_echarts_instance_");
-    
-    // 确保容器有明确的尺寸
-    domMap.style.width = '100%';
-    domMap.style.height = '45vh';
-    
-    // 初始化时指定渲染模式和尺寸
-    var mapchart = echarts.init(domMap, null, {
-        renderer: 'canvas',
-        width: 'auto',
-        height: 'auto'
-    });
-    
-    // 添加resize监听
-    const resizeHandler = () => {
-        if (mapchart) {
-            mapchart.resize({
-                width: 'auto',
-                height: 'auto'
-            });
-        }
-    };
-    
-    window.addEventListener('resize', resizeHandler);
-    
-    // 确保组件销毁时移除监听器
-    onUnmounted(() => {
-        window.removeEventListener('resize', resizeHandler);
-        mapchart.dispose();
-    });
-    
-    mapchart.showLoading();
-    fetch('./assets/data/' + jsonfile + "_full.json").then(res => {
-        return res.json()
-    }).then(data => {
-        echarts.registerMap('mapdata', data);
-        fetch('./assets/data/' + jsonfile + "_value.json").then(res => {
-            return res.json()
-        }).then(val => {
-            mapchart.hideLoading();
-            mapchart.setOption(
-                option = {
-                    title: {
-                        text: '乌鲁木齐',
-                        color: '#fff',
-                        left: '75%',
-                        top: '10%'
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '{b}:{c}'
-                    },
-                    visualMap: {
-                        min: 0,
-                        max: 300,
-                        text: ['High', 'Low'],
-                        realtime: false,
-                        calculable: true,
-                        show: false,
-                        inRange: {
-                            color: [
-                                '#313695',
-                                '#4575b4',
-                                '#74add1',
-                                '#abd9e9',
-                                '#e0f3f8',
-                                '#ffffbf',
-                                '#fee090',
-                                '#fdae61',
-                                '#f46d43',
-                                '#d73027',
-                                '#a50026'
-                            ]
-                        }
-                    },
-                    series: [
-                        {
-                            name: '统计信息',
-                            type: 'map',
-                            map: 'mapdata',
-                            label: {
-                                show: true
-                            },
-                            data: val,
-                            nameMap: {}
-                        }
-                    ]
-                }
-            );
-            mapchart.setOption(option);
-            setTimeout(() => {
-                mapchart.resize();
-            }, 0);
-        })
-    })
-}
-
-onMounted(() => {
-    // let deptName = useUserStore().deptName
-    let deptName = '乌鲁木齐'
-    if (deptName === '乌鲁木齐') {
-        loadmap('650100')
-    } else if (deptName === '巴州') {
-        loadmap('652800')
-    } else {
-        loadmap('650100')
-    }
-})
-
+// 1. 首先定义所有响应式数据
 // 左上数据
 const leftTopInfo = reactive({
     numStation: 0,
@@ -187,12 +48,14 @@ const leftTopInfo = reactive({
     numCable: 0,
     lenthCable: 0,
 })
+
 const rightTopInfo = reactive({
     numStation: 0,
     capacity: 0,
     numCable: 0,
     lenthCable: 0,
 })
+
 const leftBottomInfo = reactive({
     numStation: 0,
     capacity: 0,
@@ -211,37 +74,225 @@ const gongDianTotal_10kv = reactive({
     q: 0,
 })
 
-// 模拟初始化数据
-onMounted(() => {
-    const mockData = {
-        numStation: 123,
-        capacity: 500,
-        numCable: 1298,
-        lenthCable: 1298
-    }
+// 2. 然后定义变量和函数
+var option;
+let mapchart; // 添加图表实例的引用
 
-    Object.assign(leftTopInfo, mockData)
-    Object.assign(rightTopInfo, mockData)
-    Object.assign(leftBottomInfo, mockData)
-    Object.assign(bianPeiDianTotal, { p: 100, q: 50 })
-    Object.assign(gongDianTotal_10kv, { p: 50, q: 25 })
-    bianDianTotalCapacity.value = 1000
+const loadmap = (jsonfile) => {
+    let domMap = document.querySelector(".mapcontainer")
+    domMap.removeAttribute("_echarts_instance_");
+    
+    domMap.style.width = '100%';
+    domMap.style.height = '45vh';
+    
+    nextTick(() => {
+        mapchart = echarts.init(domMap, null, {
+            renderer: 'canvas'
+        });
+        
+        const resizeHandler = () => {
+            if (mapchart) {
+                mapchart.resize();
+            }
+        };
+        
+        window.addEventListener('resize', resizeHandler);
+        
+        onUnmounted(() => {
+            window.removeEventListener('resize', resizeHandler);
+            if (mapchart) {
+                mapchart.dispose();
+            }
+        });
+
+        mapchart.showLoading();
+        fetch('./assets/data/' + jsonfile + "_full.json")
+            .then(res => res.json())
+            .then(data => {
+                echarts.registerMap('mapdata', data);
+                fetch('./assets/data/' + jsonfile + "_value.json")
+                    .then(res => res.json())
+                    .then(val => {
+                        mapchart.hideLoading();
+                        option = {
+                            title: {
+                                text: '乌鲁木齐',
+                                color: '#fff',
+                                left: '75%',
+                                top: '10%'
+                            },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: '{b}:{c}'
+                            },
+                            visualMap: {
+                                min: 0,
+                                max: 300,
+                                text: ['High', 'Low'],
+                                realtime: false,
+                                calculable: true,
+                                show: false,
+                                inRange: {
+                                    color: [
+                                        '#313695',
+                                        '#4575b4',
+                                        '#74add1',
+                                        '#abd9e9',
+                                        '#e0f3f8',
+                                        '#ffffbf',
+                                        '#fee090',
+                                        '#fdae61',
+                                        '#f46d43',
+                                        '#d73027',
+                                        '#a50026'
+                                    ]
+                                }
+                            },
+                            series: [
+                                {
+                                    name: '统计信息',
+                                    type: 'map',
+                                    map: 'mapdata',
+                                    label: {
+                                        show: true
+                                    },
+                                    data: val,
+                                    nameMap: {}
+                                }
+                            ],
+                            graphic: [
+                                // 左上标签
+                                {
+                                    type: 'group',
+                                    left: 20,
+                                    top: 20,
+                                    z: 100,
+                                    children: [{
+                                        type: 'rect',
+                                        shape: {
+                                            width: 200,
+                                            height: 80
+                                        },
+                                        style: {
+                                            fill: '#18B495',
+                                            stroke: 'var(--vt-c-divider-light-0)',
+                                            borderRadius: 5
+                                        }
+                                    }, {
+                                        type: 'text',
+                                        style: {
+                                            text: `220KV变电站: ${leftTopInfo.numStation} 座\n容量: ${leftTopInfo.capacity} MVA`,
+                                            fill: '#fff',
+                                            fontSize: 14,
+                                            padding: [10, 10],
+                                            lineHeight: 24
+                                        }
+                                    }]
+                                },
+                                // 右上标签
+                                {
+                                    type: 'group',
+                                    right: 20,
+                                    top: 20,
+                                    z: 100,
+                                    children: [{
+                                        type: 'rect',
+                                        shape: {
+                                            width: 200,
+                                            height: 80
+                                        },
+                                        style: {
+                                            fill: '#18B495',
+                                            stroke: 'var(--vt-c-divider-light-0)',
+                                            borderRadius: 5
+                                        }
+                                    }, {
+                                        type: 'text',
+                                        style: {
+                                            text: `110KV变电站: ${rightTopInfo.numStation} 座\n容量: ${rightTopInfo.capacity} MVA`,
+                                            fill: '#fff',
+                                            fontSize: 14,
+                                            padding: [10, 10],
+                                            lineHeight: 24
+                                        }
+                                    }]
+                                },
+                                // 左下标签
+                                {
+                                    type: 'group',
+                                    left: 20,
+                                    bottom: 20,
+                                    z: 100,
+                                    children: [{
+                                        type: 'rect',
+                                        shape: {
+                                            width: 200,
+                                            height: 80
+                                        },
+                                        style: {
+                                            fill: '#18B495',
+                                            stroke: 'var(--vt-c-divider-light-0)',
+                                            borderRadius: 5
+                                        }
+                                    }, {
+                                        type: 'text',
+                                        style: {
+                                            text: `35KV变电站: ${leftBottomInfo.numStation} 座\n容量: ${leftBottomInfo.capacity} MVA`,
+                                            fill: '#fff',
+                                            fontSize: 14,
+                                            padding: [10, 10],
+                                            lineHeight: 24
+                                        }
+                                    }]
+                                }
+                            ],
+                        };
+                        
+                        mapchart.setOption(option);
+                        mapchart.resize();
+                    });
+            });
+    });
+}
+
+// 创建更新图表的方法
+const updateLabels = () => {
+    if (mapchart) {
+        mapchart.setOption({
+            graphic: [
+                // ... 更新标签配置 ...
+            ]
+        });
+    }
+}
+
+// 监听数据变化
+watch([leftTopInfo, rightTopInfo, leftBottomInfo], () => {
+    updateLabels();
+});
+
+onMounted(() => {
+    // let deptName = useUserStore().deptName
+    let deptName = '乌鲁木齐'
+    if (deptName === '乌鲁木齐') {
+        loadmap('650100')
+    } else if (deptName === '巴州') {
+        loadmap('652800')
+    } else {
+        loadmap('650100')
+    }
 })
 
 // 获取数据
 const getSubstations = async () => {
     try {
         const res = await overviewStatistic()
-        // console.log('API response:', res) // 添加日志查看完整响应
-
-        // 安全地获取数据，提供默认值
         const substationGroup = res?.data?.substationGroup || {
             "220KV": 0,
             "110KV": 0,
             "35KV": 0
         }
 
-        // 更新变电站信息
         Object.assign(leftTopInfo, {
             numStation: substationGroup["220KV"] || 0,
             capacity: (substationGroup["220KV"] || 0) * 240
@@ -255,7 +306,6 @@ const getSubstations = async () => {
             capacity: (substationGroup["35KV"] || 0) * 25
         })
 
-        // 计算总容量
         bianDianTotalCapacity.value = leftTopInfo.capacity + rightTopInfo.capacity + leftBottomInfo.capacity
     } catch (error) {
         console.error('获取变电站数据失败:', error)
@@ -277,10 +327,8 @@ onMounted(() => {
     border-radius: 5px;
     position: relative;
     box-sizing: border-box;
-    overflow: hidden; // 防止内容溢出
-    display: flex; // 使用flex布局
-    align-items: center;
-    justify-content: center;
+    min-width: 300px;
+    min-height: 300px;
 }
 
 .labelinfo {
@@ -289,9 +337,8 @@ onMounted(() => {
     color: white;
     padding: 6px;
     border-radius: 5px;
-    // background-color: #1f9e8dbe;
-    // background-color: #3c8b9a;
     background-color: #18B495;
+    z-index: 10;
 
     span {
         font-weight: bold;
@@ -301,18 +348,17 @@ onMounted(() => {
 
 .labelinfo-left-top {
     left: 20px;
-    top: 10px;
+    top: 20px;
 }
 
 .labelinfo-right-top {
     right: 20px;
-    // top: 80px;
-    top: 10px;
+    top: 20px;
 }
 
 .labelinfo-left-bottom {
     left: 20px;
-    bottom: 300px;
+    bottom: 20px;
 }
 
 // 高亮数据

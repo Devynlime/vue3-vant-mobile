@@ -23,7 +23,7 @@
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
   "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -87,5 +87,6 @@
   },
   "[javascript]": {
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
-  }
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

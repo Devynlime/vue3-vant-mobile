@@ -30,9 +30,9 @@ declare module 'vue-router/auto-routes' {
     'register': RouteRecordInfo<'register', '/register', Record<never, never>, Record<never, never>>,
     'settings': RouteRecordInfo<'settings', '/settings', Record<never, never>, Record<never, never>>,
     'smartCable': RouteRecordInfo<'smartCable', '/smartCable', Record<never, never>, Record<never, never>>,
-    '/smartCable/dev-overview/': RouteRecordInfo<'/smartCable/dev-overview/', '/smartCable/dev-overview', Record<never, never>, Record<never, never>>,
-    '/smartCable/dev-overview/deviceOverview': RouteRecordInfo<'/smartCable/dev-overview/deviceOverview', '/smartCable/dev-overview/deviceOverview', Record<never, never>, Record<never, never>>,
-    '/smartCable/video-surveillance/': RouteRecordInfo<'/smartCable/video-surveillance/', '/smartCable/video-surveillance', Record<never, never>, Record<never, never>>,
+    'devOverview': RouteRecordInfo<'devOverview', '/smartCable/dev-overview', Record<never, never>, Record<never, never>>,
+    'deviceOverview': RouteRecordInfo<'deviceOverview', '/smartCable/dev-overview/deviceOverview', Record<never, never>, Record<never, never>>,
+    'videoSurveillance': RouteRecordInfo<'videoSurveillance', '/smartCable/video-surveillance', Record<never, never>, Record<never, never>>,
     '/smartCable/video-surveillance/treeSelect': RouteRecordInfo<'/smartCable/video-surveillance/treeSelect', '/smartCable/video-surveillance/treeSelect', Record<never, never>, Record<never, never>>,
     '/smartCable/video-surveillance/videoSurveillance': RouteRecordInfo<'/smartCable/video-surveillance/videoSurveillance', '/smartCable/video-surveillance/videoSurveillance', Record<never, never>, Record<never, never>>,
   }
