@@ -20,7 +20,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
       port: 3000,
       proxy: {
         '/api': {
-          target: '',
+          target: 'https://easyapi.devv.zone/api',
           ws: false,
           changeOrigin: true,
         },

@@ -1,7 +1,7 @@
 <template>
     <el-row :gutter="0">
         <el-col>
-            <div>
+            <div class= "w-100%">
                 <div class="mapcontainer"> </div>
 
                 <div class="labelinfo labelinfo-left-top">
@@ -64,7 +64,7 @@
 </template>
 <script setup>
 import * as echarts from 'echarts';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, onUnmounted } from 'vue';
 import { overviewStatistic } from '@/api/device-overview'
 
 var option;
@@ -72,7 +72,36 @@ var option;
 const loadmap = (jsonfile) => {
     let domMap = document.querySelector(".mapcontainer")
     domMap.removeAttribute("_echarts_instance_");
-    var mapchart = echarts.init(domMap);
+    
+    // 确保容器有明确的尺寸
+    domMap.style.width = '100%';
+    domMap.style.height = '45vh';
+    
+    // 初始化时指定渲染模式和尺寸
+    var mapchart = echarts.init(domMap, null, {
+        renderer: 'canvas',
+        width: 'auto',
+        height: 'auto'
+    });
+    
+    // 添加resize监听
+    const resizeHandler = () => {
+        if (mapchart) {
+            mapchart.resize({
+                width: 'auto',
+                height: 'auto'
+            });
+        }
+    };
+    
+    window.addEventListener('resize', resizeHandler);
+    
+    // 确保组件销毁时移除监听器
+    onUnmounted(() => {
+        window.removeEventListener('resize', resizeHandler);
+        mapchart.dispose();
+    });
+    
     mapchart.showLoading();
     fetch('./assets/data/' + jsonfile + "_full.json").then(res => {
         return res.json()
@@ -131,6 +160,10 @@ const loadmap = (jsonfile) => {
                     ]
                 }
             );
+            mapchart.setOption(option);
+            setTimeout(() => {
+                mapchart.resize();
+            }, 0);
         })
     })
 }
@@ -236,13 +269,18 @@ onMounted(() => {
 
 <style scoped lang="less">
 .mapcontainer {
-    width: calc(100vw);
-    // margin-left: 30%;
-    height: calc(45vh);
+    width: 100%;
+    height: 45vh;
     margin-top: 50px;
     border: 2px solid var(--vt-c-divider-light-0);
     background-color: var(--vt-c-divider-light-1);
     border-radius: 5px;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden; // 防止内容溢出
+    display: flex; // 使用flex布局
+    align-items: center;
+    justify-content: center;
 }
 
 .labelinfo {
