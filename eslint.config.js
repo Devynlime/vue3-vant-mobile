@@ -19,12 +19,18 @@ export default antfu(
       'perfectionist/sort-imports': 'off',
       'perfectionist/sort-exports': 'off',
       'perfectionist/sort-named-exports': 'off',
+      'no-console': 'off',
     },
   },
   {
     ignores: [
       '.github/**',
       'scripts/**',
+      'public/webapp-MicroApplication.1.0.js',
+      'public/version.json',
+      'src/components/smart-cable/**',
+      'src/pages/smartCable/**',
+      '**/*.js',
     ],
   },
 )

@@ -17,6 +17,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "@unhead/vue": "^1.11.7",
     "@vant/touch-emulator": "^1.4.0",
     "@vant/use": "^1.6.0",
@@ -57,6 +58,7 @@
     "mockjs": "^1.1.0",
     "postcss-mobile-forever": "^4.1.6",
     "rollup": "^4.24.0",
+    "sass-embedded": "^1.81.0",
     "terser": "^5.34.1",
     "typescript": "^5.6.3",
     "unocss": "0.63.4",
