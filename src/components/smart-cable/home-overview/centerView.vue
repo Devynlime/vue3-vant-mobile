@@ -161,7 +161,7 @@ const loadmap = (jsonfile) => {
                                     top: 50,
                                     bottom: 50,
                                     left: 100,
-                                    right: 100,
+                                    right: 50,
                                     label: {
                                         show: true
                                     },
@@ -178,9 +178,9 @@ const loadmap = (jsonfile) => {
                                     children: [{
                                         type: 'rect',
                                         shape: {
-                                            width: 200,
-                                            height: 80,
-                                            r: 12
+                                            width: 160,
+                                            height: 65,
+                                            r: 8
                                         },
                                         style: {
                                             fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
@@ -202,18 +202,18 @@ const loadmap = (jsonfile) => {
                                             rich: {
                                                 key: {
                                                     fill: '#fff',
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                     fontWeight: 'normal'
                                                 },
                                                 value: {
                                                     fill: '#FFD700',  // 金色
-                                                    fontSize: 16,
+                                                    fontSize: 14,
                                                     fontWeight: 'bold',
                                                     padding: [0, 4]  // 左右添加间距
                                                 },
                                                 unit: {
                                                     fill: '#fff',
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                     padding: [0, 0, 0, 2]  // 左侧添加间距
                                                 }
                                             },
@@ -221,18 +221,18 @@ const loadmap = (jsonfile) => {
                                                 '{key|220KV变电站:} {value|' + leftTopInfo.numStation + '}{unit|座}\n',
                                                 '{key|容量:} {value|' + leftTopInfo.capacity + '}{unit|MVA}'
                                             ].join(''),
-                                            padding: [15, 25],
-                                            lineHeight: 24,
+                                            padding: [12, 15],
+                                            lineHeight: 20,
                                             textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
                                         }
                                     }, {
                                         // 添加装饰性图标或线条
                                         type: 'rect',
                                         shape: {
-                                            width: 4,
-                                            height: 40,
+                                            width: 3,
+                                            height: 30
                                         },
-                                        position: [0, 20],
+                                        position: [0, 17],
                                         style: {
                                             fill: '#fff',
                                             borderRadius: 2
@@ -257,9 +257,9 @@ const loadmap = (jsonfile) => {
                                     children: [{
                                         type: 'rect',
                                         shape: {
-                                            width: 200,
-                                            height: 80,
-                                            r: 12
+                                            width: 160,
+                                            height: 65,
+                                            r: 8
                                         },
                                         style: {
                                             fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
@@ -281,18 +281,18 @@ const loadmap = (jsonfile) => {
                                             rich: {
                                                 key: {
                                                     fill: '#fff',
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                     fontWeight: 'normal'
                                                 },
                                                 value: {
                                                     fill: '#FFD700',  // 金色
-                                                    fontSize: 16,
+                                                    fontSize: 14,
                                                     fontWeight: 'bold',
                                                     padding: [0, 4]  // 左右添加间距
                                                 },
                                                 unit: {
                                                     fill: '#fff',
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                     padding: [0, 0, 0, 2]  // 左侧添加间距
                                                 }
                                             },  
@@ -300,18 +300,18 @@ const loadmap = (jsonfile) => {
                                                 '{key|110KV变电站:} {value|' + rightTopInfo.numStation + '}{unit|座}\n',
                                                 '{key|容量:} {value|' + rightTopInfo.capacity + '}{unit|MVA}'
                                             ].join(''),
-                                            padding: [15, 15],
-                                            lineHeight: 24,
+                                            padding: [12, 15],
+                                            lineHeight: 20,
                                             textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
                                         }
                                     }, {
                                         // 添加装饰性图标或线条
                                         type: 'rect',
                                         shape: {
-                                            width: 4,
-                                            height: 40
+                                            width: 3,
+                                            height: 30
                                         },
-                                        position: [0, 20],
+                                        position: [0, 17],
                                         style: {
                                             fill: '#fff',
                                             borderRadius: 2
@@ -336,9 +336,9 @@ const loadmap = (jsonfile) => {
                                     children: [{
                                         type: 'rect',
                                         shape: {
-                                            width: 200,
-                                            height: 80,
-                                            r: 12
+                                            width: 160,
+                                            height: 65,
+                                            r: 8
                                         },
                                         style: {
                                             fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
@@ -360,18 +360,18 @@ const loadmap = (jsonfile) => {
                                             rich: {
                                                 key: {
                                                     fill: '#fff',
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                     fontWeight: 'normal'
                                                 },
                                                 value: {  
                                                     fill: '#FFD700',  // 金色
-                                                    fontSize: 16,
+                                                    fontSize: 14,
                                                     fontWeight: 'bold',
                                                     padding: [0, 4]  // 左右添加间距
                                                 },
                                                 unit: {
                                                     fill: '#fff',
-                                                    fontSize: 14,
+                                                    fontSize: 12,
                                                     padding: [0, 0, 0, 2]  // 左侧添加间距
                                                 }
                                             },
@@ -379,18 +379,18 @@ const loadmap = (jsonfile) => {
                                                 '{key|35KV变电站:} {value|' + leftBottomInfo.numStation + '}{unit|座}\n',
                                                 '{key|容量:} {value|' + leftBottomInfo.capacity + '}{unit|MVA}'
                                             ].join(''),
-                                            padding: [15, 15],
-                                            lineHeight: 24,
+                                            padding: [12, 15],
+                                            lineHeight: 20,
                                             textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
                                         }
                                     }, {
                                         // 添加装饰性图标或线条
                                         type: 'rect',
                                         shape: {
-                                            width: 4,
-                                            height: 40
+                                            width: 3,
+                                            height: 30
                                         },
-                                        position: [0, 20],
+                                        position: [0, 17],
                                         style: {
                                             fill: '#fff',
                                             borderRadius: 2
