@@ -14,22 +14,27 @@
                 <div class="card-content">
                     <p class="text-center">变配电总功率</p>
 
-                    <el-row :gutter="0" class="text-center">
-                        <el-col :span="12">有功 <span class="highlight-values"> {{ bianPeiDianTotal.p }} </span>MW
+                    <el-row :gutter="20" class="text-center power-row">
+                        <el-col :span="12" class="power-col">
+                            <span>有功 <span class="highlight-values">{{ bianPeiDianTotal.p }}</span>MW</span>
                         </el-col>
-
-                        <el-col :span="12">无功<span class="highlight-values"> {{ bianPeiDianTotal.q }}
-                            </span>Mvar</el-col>
+                        <el-col :span="12" class="power-col">
+                            <span>无功 <span class="highlight-values">{{ bianPeiDianTotal.q }}</span>Mvar</span>
+                        </el-col>
                     </el-row>
 
                 </div>
 
                 <p class="text-center">10kv电缆线路配供电总功率</p>
 
-                <el-row :gutter="0" class="text-center">
-                    <el-col :span="12">有功 <span class="highlight-values"> {{ gongDianTotal_10kv.p }} </span>MW </el-col>
+                <el-row :gutter="0" class="text-center power-row">
+                    <el-col :span="12" class="power-col">
+                        <span>有功 <span class="highlight-values"> {{ gongDianTotal_10kv.p }} </span>MW </span>
+                    </el-col>
 
-                    <el-col :span="12">无功<span class="highlight-values"> {{ gongDianTotal_10kv.q }} </span>Mvar</el-col>
+                    <el-col :span="12" class="power-col">
+                        <span>无功<span class="highlight-values"> {{ gongDianTotal_10kv.q }} </span>Mvar</span>
+                    </el-col>
                 </el-row>
             </el-card>
         </el-col>
@@ -83,7 +88,7 @@ const loadmap = (jsonfile) => {
     domMap.removeAttribute("_echarts_instance_");
     
     domMap.style.width = '100%';
-    domMap.style.height = '45vh';
+    domMap.style.height = '50vh';
     
     nextTick(() => {
         mapchart = echarts.init(domMap, null, {
@@ -119,7 +124,7 @@ const loadmap = (jsonfile) => {
                                 text: '乌鲁木齐',
                                 color: '#fff',
                                 left: '75%',
-                                top: '10%'
+                                top: '30%'
                             },
                             tooltip: {
                                 trigger: 'item',
@@ -153,11 +158,14 @@ const loadmap = (jsonfile) => {
                                     name: '统计信息',
                                     type: 'map',
                                     map: 'mapdata',
+                                    top: 50,
+                                    bottom: 50,
+                                    left: 100,
+                                    right: 100,
                                     label: {
                                         show: true
                                     },
                                     data: val,
-                                    nameMap: {}
                                 }
                             ],
                             graphic: [
@@ -165,85 +173,238 @@ const loadmap = (jsonfile) => {
                                 {
                                     type: 'group',
                                     left: 20,
-                                    top: 20,
+                                    top: 0,
                                     z: 100,
                                     children: [{
                                         type: 'rect',
                                         shape: {
                                             width: 200,
-                                            height: 80
+                                            height: 80,
+                                            r: 12
                                         },
                                         style: {
-                                            fill: '#18B495',
-                                            stroke: 'var(--vt-c-divider-light-0)',
-                                            borderRadius: 5
+                                            fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
+                                                offset: 0,
+                                                color: '#18B495'
+                                            }, {
+                                                offset: 1,
+                                                color: '#16A085'
+                                            }]),
+                                            shadowBlur: 10,
+                                            shadowColor: 'rgba(0,0,0,0.2)',
+                                            shadowOffsetX: 2,
+                                            shadowOffsetY: 2,
+                                            borderRadius: 8
                                         }
                                     }, {
                                         type: 'text',
                                         style: {
-                                            text: `220KV变电站: ${leftTopInfo.numStation} 座\n容量: ${leftTopInfo.capacity} MVA`,
-                                            fill: '#fff',
-                                            fontSize: 14,
-                                            padding: [10, 10],
-                                            lineHeight: 24
+                                            rich: {
+                                                key: {
+                                                    fill: '#fff',
+                                                    fontSize: 14,
+                                                    fontWeight: 'normal'
+                                                },
+                                                value: {
+                                                    fill: '#FFD700',  // 金色
+                                                    fontSize: 16,
+                                                    fontWeight: 'bold',
+                                                    padding: [0, 4]  // 左右添加间距
+                                                },
+                                                unit: {
+                                                    fill: '#fff',
+                                                    fontSize: 14,
+                                                    padding: [0, 0, 0, 2]  // 左侧添加间距
+                                                }
+                                            },
+                                            text: [
+                                                '{key|220KV变电站:} {value|' + leftTopInfo.numStation + '}{unit|座}\n',
+                                                '{key|容量:} {value|' + leftTopInfo.capacity + '}{unit|MVA}'
+                                            ].join(''),
+                                            padding: [15, 25],
+                                            lineHeight: 24,
+                                            textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
                                         }
-                                    }]
+                                    }, {
+                                        // 添加装饰性图标或线条
+                                        type: 'rect',
+                                        shape: {
+                                            width: 4,
+                                            height: 40,
+                                        },
+                                        position: [0, 20],
+                                        style: {
+                                            fill: '#fff',
+                                            borderRadius: 2
+                                        }
+                                    }],
+                                    // 添加鼠标悬停效果
+                                    onmouseover: function() {
+                                        this.children[0].style.shadowBlur = 20;
+                                        mapchart.setOption(option);
+                                    },
+                                    onmouseout: function() {
+                                        this.children[0].style.shadowBlur = 10;
+                                        mapchart.setOption(option);
+                                    }
                                 },
                                 // 右上标签
                                 {
                                     type: 'group',
                                     right: 20,
-                                    top: 20,
+                                    top: 0,
                                     z: 100,
                                     children: [{
                                         type: 'rect',
                                         shape: {
                                             width: 200,
-                                            height: 80
+                                            height: 80,
+                                            r: 12
                                         },
                                         style: {
-                                            fill: '#18B495',
-                                            stroke: 'var(--vt-c-divider-light-0)',
-                                            borderRadius: 5
+                                            fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
+                                                offset: 0,
+                                                color: '#18B495'
+                                            }, {
+                                                offset: 1,
+                                                color: '#16A085'
+                                            }]),
+                                            shadowBlur: 10,
+                                            shadowColor: 'rgba(0,0,0,0.2)',
+                                            shadowOffsetX: 2,
+                                            shadowOffsetY: 2,
+                                            borderRadius: 8
                                         }
                                     }, {
                                         type: 'text',
                                         style: {
-                                            text: `110KV变电站: ${rightTopInfo.numStation} 座\n容量: ${rightTopInfo.capacity} MVA`,
-                                            fill: '#fff',
-                                            fontSize: 14,
-                                            padding: [10, 10],
-                                            lineHeight: 24
+                                            rich: {
+                                                key: {
+                                                    fill: '#fff',
+                                                    fontSize: 14,
+                                                    fontWeight: 'normal'
+                                                },
+                                                value: {
+                                                    fill: '#FFD700',  // 金色
+                                                    fontSize: 16,
+                                                    fontWeight: 'bold',
+                                                    padding: [0, 4]  // 左右添加间距
+                                                },
+                                                unit: {
+                                                    fill: '#fff',
+                                                    fontSize: 14,
+                                                    padding: [0, 0, 0, 2]  // 左侧添加间距
+                                                }
+                                            },  
+                                            text: [ 
+                                                '{key|110KV变电站:} {value|' + rightTopInfo.numStation + '}{unit|座}\n',
+                                                '{key|容量:} {value|' + rightTopInfo.capacity + '}{unit|MVA}'
+                                            ].join(''),
+                                            padding: [15, 15],
+                                            lineHeight: 24,
+                                            textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
                                         }
-                                    }]
+                                    }, {
+                                        // 添加装饰性图标或线条
+                                        type: 'rect',
+                                        shape: {
+                                            width: 4,
+                                            height: 40
+                                        },
+                                        position: [0, 20],
+                                        style: {
+                                            fill: '#fff',
+                                            borderRadius: 2
+                                        }
+                                    }],
+                                    // 添加鼠标悬停效果
+                                    onmouseover: function() {
+                                        this.children[0].style.shadowBlur = 20;
+                                        mapchart.setOption(option);
+                                    },
+                                    onmouseout: function() {
+                                        this.children[0].style.shadowBlur = 10;
+                                        mapchart.setOption(option);
+                                    }
                                 },
                                 // 左下标签
                                 {
                                     type: 'group',
                                     left: 20,
-                                    bottom: 20,
+                                    bottom: 0,
                                     z: 100,
                                     children: [{
                                         type: 'rect',
                                         shape: {
                                             width: 200,
-                                            height: 80
+                                            height: 80,
+                                            r: 12
                                         },
                                         style: {
-                                            fill: '#18B495',
-                                            stroke: 'var(--vt-c-divider-light-0)',
-                                            borderRadius: 5
+                                            fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
+                                                offset: 0,
+                                                color: '#18B495'
+                                            }, {
+                                                offset: 1,
+                                                color: '#16A085'
+                                            }]),
+                                            shadowBlur: 10,
+                                            shadowColor: 'rgba(0,0,0,0.2)',
+                                            shadowOffsetX: 2,
+                                            shadowOffsetY: 2,
+                                            borderRadius: 8
                                         }
                                     }, {
                                         type: 'text',
                                         style: {
-                                            text: `35KV变电站: ${leftBottomInfo.numStation} 座\n容量: ${leftBottomInfo.capacity} MVA`,
-                                            fill: '#fff',
-                                            fontSize: 14,
-                                            padding: [10, 10],
-                                            lineHeight: 24
+                                            rich: {
+                                                key: {
+                                                    fill: '#fff',
+                                                    fontSize: 14,
+                                                    fontWeight: 'normal'
+                                                },
+                                                value: {  
+                                                    fill: '#FFD700',  // 金色
+                                                    fontSize: 16,
+                                                    fontWeight: 'bold',
+                                                    padding: [0, 4]  // 左右添加间距
+                                                },
+                                                unit: {
+                                                    fill: '#fff',
+                                                    fontSize: 14,
+                                                    padding: [0, 0, 0, 2]  // 左侧添加间距
+                                                }
+                                            },
+                                            text: [
+                                                '{key|35KV变电站:} {value|' + leftBottomInfo.numStation + '}{unit|座}\n',
+                                                '{key|容量:} {value|' + leftBottomInfo.capacity + '}{unit|MVA}'
+                                            ].join(''),
+                                            padding: [15, 15],
+                                            lineHeight: 24,
+                                            textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
                                         }
-                                    }]
+                                    }, {
+                                        // 添加装饰性图标或线条
+                                        type: 'rect',
+                                        shape: {
+                                            width: 4,
+                                            height: 40
+                                        },
+                                        position: [0, 20],
+                                        style: {
+                                            fill: '#fff',
+                                            borderRadius: 2
+                                        }
+                                    }],
+                                    // 添加鼠标悬停效果
+                                    onmouseover: function() {
+                                        this.children[0].style.shadowBlur = 20;
+                                        mapchart.setOption(option);
+                                    },
+                                    onmouseout: function() {
+                                        this.children[0].style.shadowBlur = 10;
+                                        mapchart.setOption(option);
+                                    }
                                 }
                             ],
                         };
@@ -321,7 +482,7 @@ onMounted(() => {
 .mapcontainer {
     width: 100%;
     height: 45vh;
-    margin-top: 50px;
+    margin-top: 5px;
     border: 2px solid var(--vt-c-divider-light-0);
     background-color: var(--vt-c-divider-light-1);
     border-radius: 5px;
@@ -386,14 +547,26 @@ onMounted(() => {
     border: #3c8b9a 1px solid;
     border-radius: 5px;
     margin: 10px 0;
-
+    padding: 10px;
     color: #fff;
     background-color: #3c8b9a;
+    overflow: hidden;
 }
 
 .text-center {
     // 居中
     text-align: center;
 
+}
+
+.power-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.power-col {
+    flex: 1;
+    white-space: nowrap;
 }
 </style>
