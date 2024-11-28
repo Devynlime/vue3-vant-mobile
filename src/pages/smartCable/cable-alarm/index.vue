@@ -310,8 +310,7 @@ const activeTab = ref(0)
 :deep(.van-tab--active) {
   font-weight: 600;
 }
-</style>
-<route lang="json">
+</style><route lang="json">
     {
         "name":"cableAlarm",
         "meta":{

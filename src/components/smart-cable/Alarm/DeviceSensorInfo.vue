@@ -6,15 +6,15 @@
             <div class="status-bar">
                 <div class="status-item">
                     <span class="number">188</span>
-                    <img src="/smart-cable-v2/assets/images/sensor.png" class="icon" />
+                    <img src="/assets/images/sensor.png" class="icon" />
                 </div>
                 <div class="status-item">
                     <span class="number">0</span>
-                    <img src="/smart-cable-v2/assets/images/online.png" class="icon" />
+                    <img src="/assets/images/online.png" class="icon" />
                 </div>
                 <div class="status-item">
                     <span class="number">188</span>
-                    <img src="/smart-cable-v2/assets/images/offline.png" class="icon" />
+                    <img src="/assets/images/offline.png" class="icon" />
                 </div>
             </div>
 
