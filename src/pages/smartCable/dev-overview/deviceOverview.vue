@@ -62,6 +62,25 @@ onMounted(async () => {
       }))
     }
 
+    // 更新配网线路饼图数据
+    if (chart_line.value && feederLineStatisticData.value) {
+      option_line.value.series[0].data = [
+        { 
+            value: feederLineStatisticData.value.erection.混合 || 0, 
+            name: '混合线路'
+          },
+          { 
+            value: feederLineStatisticData.value.erection.电缆 || 0, 
+            name: '电缆线路'
+          },
+          { 
+            value: feederLineStatisticData.value.erection.架空 || 0, 
+            name: '架空线路'
+          }
+        ]
+      chart_line.value.setOption(option_line.value, true)
+    }
+
     // 根据display属性初始化相应的图表
     if (props.display === 'right') {
       initChart_cable()
@@ -603,7 +622,7 @@ const getTooltipText = computed(() => (label, state) => {
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   width: 100%;
-  height: 320px;
+  height: 280px;
 }
 
 .statisticPieChart_cable {
