@@ -1,109 +1,104 @@
 <template>
-    <div style="margin-top: 8px;">
-        <el-row>
-            <el-col :span="8">
-                <el-statistic :value="statisticJson.installed" @click="gotoManholeDeviceData('ambienttemperature',0)" >
-                    <template #suffix>
-                        <el-image src="/smart-cable-v2/assets/images/sensor.png" style="width:20px;height: 18px;" />
-                    </template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic :value="statisticJson.installed-statisticJson.offLineCount" @click="gotoManholeDeviceData('ambienttemperature',1)" >
-                    <template #suffix>
-                        <el-image src="/smart-cable-v2/assets/images/online.png" style="width:20px;height: 18px;" />
-                    </template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic :value="statisticJson.offLineCount" @click="gotoManholeDeviceData('ambienttemperature',-1)" >
-                    <template #suffix>
-                        <el-image src="/smart-cable-v2/assets/images/offline.png" style="width:20px;height: 18px;" />
-                    </template>
-                </el-statistic>
-            </el-col>
-        </el-row>
-        <el-row></el-row>
-        <el-row>
-            <el-col :span="8">
-                <el-statistic title="电缆温度" :value="184" :value-style="valueStyle"  @click="gotoManholeDeviceData('cablehead_tem',0)" >
-                    <template #suffix>/<span style="color:red;">0</span></template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic title="环境温度" :value="statisticJson.installed" :value-style="valueStyle" @click="gotoManholeDeviceData('ambienttemperature',0)" >
-                    <template #suffix>/<span style="color:red;">{{statisticJson.ambienttemperature_error}}</span></template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic title="电缆震动" :value="statisticJson.cablesnum" :value-style="valueStyle" @click="gotoManholeDeviceData('cablehead',0)" >
-                    <template #suffix>/<span style="color:red;">0</span></template>
-                </el-statistic>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="8">
-                <el-statistic title="设备信号" :value="statisticJson.installed" :value-style="valueStyle" @click="gotoManholeDeviceData('signal4g',0)" >
-                    <template #suffix>/<span style="color:red;">{{statisticJson.signal4g_error}}</span></template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic title="烟感报警" :value="statisticJson.installed" :value-style="valueStyle" @click="gotoManholeDeviceData('smokedetector',0)" >
-                    <template #suffix>/<span style="color:red;">0</span></template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic title="水浸检测" :value="statisticJson.installed" :value-style="valueStyle" @click="gotoManholeDeviceData('waterlevel',0)" >
-                    <template #suffix>/<span style="color:red;">0</span></template>
-                </el-statistic>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="8">
-                <el-statistic title="大气压强" :value="statisticJson.installed" :value-style="valueStyle" @click="gotoManholeDeviceData('waterlevelvalue',0)" >
-                    <template #suffix>/<span style="color:red;">{{statisticJson.waterlevelvalue_error}}</span></template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic title="井盖状态" :value="statisticJson.installed" :value-style="valueStyle" @click="gotoManholeDeviceData('manholecover',0)" >
-                    <template #suffix>/<span style="color:red;">0</span></template>
-                </el-statistic>
-            </el-col>
-            <el-col :span="8">
-                <el-statistic title="电池状态" :value="statisticJson.installed" :value-style="valueStyle" @click="gotoManholeDeviceData('BatteryVoltage',0)" >
-                    <template #suffix>/<span style="color:red;">{{ statisticJson.BatteryVoltage_error }}</span></template>
-                </el-statistic>
-            </el-col>
-        </el-row>
+    <div class="device-sensor-info">
+        <div class="title">设备传感器情况</div>
+        <div class="sensor-content">
+            <!-- 顶部状态栏 -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <span class="number">188</span>
+                    <img src="/smart-cable-v2/assets/images/sensor.png" class="icon" />
+                </div>
+                <div class="status-item">
+                    <span class="number">0</span>
+                    <img src="/smart-cable-v2/assets/images/online.png" class="icon" />
+                </div>
+                <div class="status-item">
+                    <span class="number">188</span>
+                    <img src="/smart-cable-v2/assets/images/offline.png" class="icon" />
+                </div>
+            </div>
+
+            <!-- 传感器数据 -->
+            <div class="sensor-grid">
+                <!-- 第一行 -->
+                <div class="sensor-row">
+                    <div class="sensor-item" @click="gotoManholeDeviceData('cablehead_tem',0)">
+                        <div class="label">电缆温度</div>
+                        <div class="value">
+                            <span class="normal">184</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                    <div class="sensor-item" @click="gotoManholeDeviceData('ambienttemperature',0)">
+                        <div class="label">环境温度</div>
+                        <div class="value">
+                            <span class="normal">188</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                    <div class="sensor-item" @click="gotoManholeDeviceData('cablehead',0)">
+                        <div class="label">电缆震动</div>
+                        <div class="value">
+                            <span class="normal">357</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二行 -->
+                <div class="sensor-row">
+                    <div class="sensor-item">
+                        <div class="label">设备信号</div>
+                        <div class="value">
+                            <span class="normal">188</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                    <div class="sensor-item">
+                        <div class="label">烟感报警</div>
+                        <div class="value">
+                            <span class="normal">188</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                    <div class="sensor-item">
+                        <div class="label">水浸检测</div>
+                        <div class="value">
+                            <span class="normal">188</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三行 -->
+                <div class="sensor-row">
+                    <div class="sensor-item">
+                        <div class="label">大气压强</div>
+                        <div class="value">
+                            <span class="normal">188</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                    <div class="sensor-item">
+                        <div class="label">井盖状态</div>
+                        <div class="value">
+                            <span class="normal">188</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                    <div class="sensor-item">
+                        <div class="label">电池状态</div>
+                        <div class="value">
+                            <span class="normal">188</span>/<span class="error">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
 <script setup>
 import { onMounted, ref } from 'vue'
-import {getManholeDeviceInfoStatistic } from "@/api/astus-dataapi"
+import { getManholeDeviceInfoStatistic } from "@/api/astus-dataapi"
 import useEWMStore from '@/stores/modules/earlyWarningManagement'
-import settingManageStore from '@/stores/modules/settingManage'
 import { useRouter } from 'vue-router'
 
-
-const router = useRouter();
+const router = useRouter()
 const eWMStore = useEWMStore()
-const smStore = settingManageStore()
 
-const valueStyle = ref({
-    color: 'blue',
-    fontSize: '16px',
-    fontWeight: 'bold'
-})
-const statisticJson = ref({
-    BatteryVoltage_error: 0,
-    ambienttemperature_error: 0,
-    cablesnum: 0,
-    installed: 0,
-    offLineCount: 0,
-    offlineCable: 0,
-    signal4g_error: 0,
-    waterlevelvalue_error: 0
-})
 onMounted(() => {
     getManholeDeviceInfoStatistic().then(res => {
         statisticJson.value = res.data
@@ -120,43 +115,111 @@ const gotoManholeDeviceData = (sensor,offline) =>{
     })
 }
 </script>
+
 <style scoped>
-.el-col {
-    text-align: center;
+.device-sensor-info {
+    background: var(--el-bg-color);
+    padding: 12px;
+    border-radius: 4px;
+    color: var(--el-text-color-primary);
 }
 
-:deep(.el-row) {
-    box-sizing: border-box;
+.title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--el-border-color);
+    padding-bottom: 6px;
+}
+
+.status-bar {
     display: flex;
-    flex-wrap: wrap;
-    position: relative;
-    margin-bottom: 8px;
+    justify-content: space-around;
+    margin-bottom: 12px;
 }
 
-:deep(.el-statistic__head) {
-    color: var(--el-statistic-title-color);
-    font-size: var(--el-statistic-title-font-size);
-    font-weight: var(--el-statistic-title-font-weight);
-    line-height: 20px;
-    margin-bottom: 0px;
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-:deep(.el-statistic__content ) {
-    color: var(--el-statistic-content-color);
-    font-size: 1rem;
-    /* font-weight: var(--el-statistic-content-font-weight); */
-    line-height: 14px;
-}
-
-:deep(.el-statistic__content .el-statistic__number){
+.number {
+    font-size: 18px;
+    font-weight: bold;
     text-decoration: underline;
-    cursor: pointer;
+    color: #fff;
 }
 
-:deep(.el-statistic__content .el-statistic__suffix) {
-    display: inline-block;
-    margin-left: 4px;
-    text-decoration: underline;
+.icon {
+    width: 20px;
+    height: 20px;
+    filter: var(--el-icon-filter); /* 深色模式下自动调整图标颜色 */
+}
+
+.sensor-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sensor-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.sensor-item {
+    flex: 1;
+    text-align: center;
     cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sensor-item:hover {
+    background-color: var(--el-fill-color-light);
+}
+
+.label {
+    color: var(--el-text-color-secondary);
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.value {
+    font-size: 14px;
+}
+
+.normal {
+    color: #0066FF;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.error {
+    color: #FF0000;
+    font-weight: bold;
+}
+
+/* 深色模式特定样式 */
+:root[data-theme='dark'] .device-sensor-info {
+    background: var(--el-bg-color-overlay);
+}
+
+:root[data-theme='dark'] .icon {
+    filter: brightness(0.8) invert(1);
+}
+
+:root[data-theme='dark'] .normal {
+    color: #409EFF;
+}
+
+:root[data-theme='dark'] .error {
+    color: #F56C6C;
+}
+
+:root[data-theme='dark'] .status-bar .number {
+    color: #fff;
 }
 </style>

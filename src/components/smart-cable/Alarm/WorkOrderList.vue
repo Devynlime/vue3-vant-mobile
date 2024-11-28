@@ -1,401 +1,301 @@
 <template>
-    <div class="alarm-data-list">
-        <transition-group name="list" tag="div">
-            <div class="alarmMsg alarmMsg-ambienttemperature" v-for="item in groupAlarmMessage" :key="item.ast_id">
-                <el-descriptions style="width:100%;" title="烟雾报警" :column="2" size="small">
-                    <template #title>
-                        <span style="font-weight: bolder;">{{ getAlertType(item.alarmType) }}</span>
-                    </template>
-                    <template #extra>
-                        <el-button link type="primary" @click="confirmWorkorder(item)">确认工单</el-button>
-                    </template>
-                    <el-descriptions-item label="时间" :span="1">{{ item.updateTime.substr(0, 10)
-                        }}</el-descriptions-item>
-                    <el-descriptions-item label="工井" :span="1">{{ item.manholeName }}</el-descriptions-item>
-                    <el-descriptions-item label="数据">
-                        <el-tag type="danger" size="small" effect="dark">{{ getFormatValue(item.alarmType, item.valmax)
-                            }}</el-tag>
-                    </el-descriptions-item>
-                    <el-descriptions-item label="次数">
-                        <el-tag size="small" @click="showAlarmListDlg(item)">{{ item.amcount }}</el-tag>
-                    </el-descriptions-item>
-                    <el-descriptions-item label="信息:" :span="2" label-class-name="custom-label">
-                        <el-tag type="danger" size="small">{{ item.message }}</el-tag>
-                    </el-descriptions-item>
-                    <el-descriptions-item v-if="item.maintOrgName" label="维护单位:" :span="2" label-class-name="custom-label">
-                        <el-tag type="default" size="small">{{ item.maintOrgName }}</el-tag>
-                    </el-descriptions-item>
-                    <el-descriptions-item label="地址:" :span="2">
-                        <el-button type="primary" link @click="goParentMapPosition(item)"
-                            style="max-width: 230px;text-wrap: wrap;">
-                            {{ item.position }}
-                        </el-button>
-                    </el-descriptions-item>
-                </el-descriptions>
+  <div class="work-order-list">
+    <van-empty v-if="!workOrderList.length" description="暂无工单" />
+    
+    <transition-group name="list">
+      <div v-for="item in workOrderList" :key="item.id" class="work-order-card">
+        <div class="order-header">
+          <div class="order-type">
+            <van-icon name="warning-o" :color="getTypeColor(item.alarmType)"/>
+            <span>{{ getAlertType(item.alarmType) }}</span>
+          </div>
+          <div class="order-time">{{ item.createTime }}</div>
+        </div>
+        
+        <div class="order-content">
+          <div class="content-row">
+            <div class="label">
+              <van-icon name="warning-o" color="#ee0a24"/>
+              <span>告警次数</span>
             </div>
-            <div style="height: 50px;"></div>
-        </transition-group>
-        <el-dialog :title="workorderTitle" v-model="dialogVisible" style="height: 450px;width: 600px;"
-            :draggable="`true`" @close="cancel">
-            <el-descriptions class="margin-top" :column="2" :size="size" border>
-                <el-descriptions-item width="100px;">
-                    <template #label>
-                        <div style="display: flex;flex-direction: row;">
-                            <el-icon style="align-items: center;">
-                                <Clock />
-                            </el-icon>
-                            <span style="align-self: center;margin-left: 4px;margin-top: 2px;">时间</span>
-                        </div>
-                    </template>
-                    {{ currentWorkorder.updateTime.substr(0, 10) }}
-                </el-descriptions-item>
-                <el-descriptions-item>
-                    <template #label>
-                        <div style="display: flex;flex-direction: row;">
-                            <el-icon style="align-items: center;">
-                                <RefreshLeft />
-                            </el-icon>
-                            <span style="align-self: center;margin-left: 4px;margin-top: 2px;">次数</span>
-                        </div>
-                    </template>
-                    {{ currentWorkorder.amcount }}
-                </el-descriptions-item>
-                <el-descriptions-item>
-                    <template #label>
-                        <div style="display: flex;flex-direction: row;">
-                            <el-icon style="align-items: center;">
-                                <HelpFilled />
-                            </el-icon>
-                            <span style="align-self: center;margin-left: 4px;margin-top: 2px;">工井</span>
-                        </div>
-                    </template>
-                    {{ currentWorkorder.manholeName }}
-                </el-descriptions-item>
-                <el-descriptions-item>
-                    <template #label>
-                        <div style="display: flex;flex-direction: row;">
-                            <el-icon style="align-items: center;">
-                                <tickets />
-                            </el-icon>
-                            <span style="align-self: center;margin-left: 4px;margin-top: 2px;">数值</span>
-                        </div>
-                    </template>
-                    {{ currentWorkorder.valmax }}
-                </el-descriptions-item>
-                <el-descriptions-item span="2">
-                    <template #label>
-                        <div style="display: flex;flex-direction: row;">
-                            <el-icon style="align-items: center;">
-                                <Bell />
-                            </el-icon>
-                            <span style="align-self: center;margin-left: 4px;margin-top: 2px;">告警信息</span>
-                        </div>
-                    </template>
-                    {{ currentWorkorder.message }}
-                </el-descriptions-item>
-                <el-descriptions-item span="2">
-                    <template #label>
-                        <div style="display: flex;flex-direction: row;">
-                            <el-icon style="align-items: center;">
-                                <location />
-                            </el-icon>
-                            <span style="align-self: center;margin-left: 4px;margin-top: 2px;">地址</span>
-                        </div>
-                    </template>
-                    {{ currentWorkorder.position }}
-                </el-descriptions-item>
-            </el-descriptions>
-            <el-form :model="form" label-width="auto" style="margin-top:10px;" :label-position="'top'">
-                <el-form-item label="告警确认信息">
-                    <el-input v-model="form.confirmMessage" type="textarea" rows="8" resize="none" show-word-limit
-                        maxlength="256" />
-                </el-form-item>
-                <el-form-item>
-                    <div style="display: flex;flex-direction: row;justify-content:space-between;width: 100%;">
-                        <el-select v-model="form.deviceStatus" style="width: 240px;">
-                            <el-option label="告警信息" value="normal" />
-                            <el-option label="错误误报" value="error" />
-                        </el-select>
-                        <div>
-                            <el-button type="primary" @click="onSubmit" :loading="isloading">确 认</el-button>
-                            <el-button @click="cancelSubmit">取 消</el-button>
-                        </div>
-                    </div>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
-    </div>
+            <div class="value alarm-count" @click="showAlarmListDlg(item)">
+              {{ item.amcount }}
+            </div>
+          </div>
+
+          <div class="content-row">
+            <div class="label">
+              <van-icon name="info-o" color="#1989fa"/>
+              <span>告警信息</span>
+            </div>
+            <div class="value message">{{ item.message }}</div>
+          </div>
+
+          <div class="content-row" v-if="item.maintOrgName">
+            <div class="label">
+              <van-icon name="shop-o" color="#07c160"/>
+              <span>维护单位</span>
+            </div>
+            <div class="value org">{{ item.maintOrgName }}</div>
+          </div>
+
+          <div class="content-row">
+            <div class="label">
+              <van-icon name="location-o" color="#ff976a"/>
+              <span>地址信息</span>
+            </div>
+            <div class="value location" @click="goParentMapPosition(item)">
+              {{ item.position }}
+            </div>
+          </div>
+        </div>
+
+        <div class="order-footer">
+          <van-button size="small" type="primary" plain @click="showAlarmListDlg(item)">
+            查看告警
+          </van-button>
+          <van-button size="small" type="primary" @click="goParentMapPosition(item)">
+            查看位置
+          </van-button>
+        </div>
+      </div>
+    </transition-group>
+  </div>
 </template>
+
+<style scoped>
+.work-order-list {
+  padding: 4px;
+}
+
+.work-order-card {
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.work-order-card:last-child {
+  margin-bottom: 0;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f7f8fa;
+  border-bottom: 1px solid #ebedf0;
+}
+
+.order-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #323233;
+}
+
+.order-time {
+  font-size: 12px;
+  color: #969799;
+}
+
+.order-content {
+  padding: 12px;
+}
+
+.content-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.content-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 80px;
+  font-size: 13px;
+  color: #969799;
+}
+
+.value {
+  flex: 1;
+  font-size: 13px;
+  color: #323233;
+  word-break: break-all;
+}
+
+.alarm-count {
+  color: #ee0a24;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.location {
+  color: #1989fa;
+  cursor: pointer;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px;
+  background: #f7f8fa;
+  border-top: 1px solid #ebedf0;
+}
+
+/* 动画效果 */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  .work-order-card {
+    background: #2c2c2e;
+  }
+
+  .order-header {
+    background: #1c1c1e;
+    border-color: #3a3a3c;
+  }
+
+  .order-type {
+    color: #fff;
+  }
+
+  .value {
+    color: #fff;
+  }
+
+  .order-footer {
+    background: #1c1c1e;
+    border-color: #3a3a3c;
+  }
+}
+
+/* 小屏幕适配 */
+@media screen and (max-width: 320px) {
+  .order-header {
+    padding: 8px;
+  }
+
+  .order-content {
+    padding: 8px;
+  }
+
+  .order-footer {
+    padding: 8px;
+  }
+
+  .label {
+    font-size: 12px;
+  }
+
+  .value {
+    font-size: 12px;
+  }
+}
+
+/* 添加空状态样式 */
+:deep(.van-empty) {
+  padding: 32px 0;
+}
+</style>
 
 <script setup>
 import { getGroupAlarmMessage } from "@/api/alarmMessage"
 import { workOrderUpdate } from '@/api/work-order'
 import { onMounted, ref, reactive } from "vue";
 import { ElMessage } from 'element-plus'
-import {
-    Location,
-    Bell,
-    Tickets,
-    User,
-    Clock,
-    RefreshLeft,
-    HelpFilled
-} from '@element-plus/icons-vue'
+
 const emit = defineEmits(['AlarmListDlg', 'goMapPosition'])
+const workOrderList = ref([])
 
-
-const dialogVisible = ref(false)
-const cancel = () => {
-    dialogVisible.value = false
+// 获取告警类型颜色
+const getTypeColor = (alarmType) => {
+  const typeColors = {
+    ambienttemperature: '#ff8917',
+    BatteryVoltage: '#ee0a24',
+    cablehead: '#2f86f6',
+    cablehead_tem: '#ff4d4f',
+    manholecover: '#07c160',
+    signal4g: '#7232dd',
+    smokedetector: '#ff976a',
+    waterlevel: '#1989fa',
+    waterlevelvalue: '#ff8917'
+  }
+  const type = deleteNum(alarmType)
+  return typeColors[type] || '#969799'
 }
 
-const workorderTitle = ref('工单确认')
-const currentWorkorder = ref(null)
-const confirmWorkorder = (item) => {
-    currentWorkorder.value = item
-    console.log(currentWorkorder.value)
-    workorderTitle.value = getAlertType(item.alarmType) + ' ｜ 工单确认'
-    dialogVisible.value = true
-}
-
-const form = reactive({
-    deviceStatus: 'normal',
-    id: '',
-    alarmType: '',
-    confirmMessage: '',
-})
-
-const isloading = ref(false)
-const onSubmit = () => {
-    if (form.confirmMessage.length < 10) {
-        ElMessage({
-            message: '请输入一定量的确认信息',
-            type: 'warning',
-        })
-        return
-    }
-    isloading.value = true
-    form.id = currentWorkorder.value.id
-    form.alarmType = deleteNum(currentWorkorder.value.alarmType)
-    console.log(form)
-    workOrderUpdate(form).then(res => {
-        isloading.value = false
-        console.log(res)
-        if (res.data === 2) {
-            ElMessage({
-                message: '工单确认成功。',
-                type: 'success',
-            })
-            getWorkOrderList()
-            dialogVisible.value = false
-        } else if (res.data === -1) {
-            ElMessage({
-                message: res.msg,
-                type: 'warning',
-            })
-            dialogVisible.value = false
-        } else {
-            ElMessage({
-                message: '工单确认异常',
-                type: 'warning',
-            })
-            dialogVisible.value = false
-        }
-        form.confirmMessage = ''
-    })
-}
-
-const cancelSubmit = () => {
-    dialogVisible.value = false
-}
-
-const showAlarmListDlg = (item) => {
-    emit('AlarmListDlg', item)
-}
-
-const goParentMapPosition = (item) => {
-    console.log("goParentMapPosition>>>>", item)
-    emit('goMapPosition', { flydata: { center: [item.longitude, item.latitude], zoom: 16 }, title: item.manholeName, id: item.id })
-}
-
+// 删除字符串中的数字
 const deleteNum = (str) => {
-    let reg = /[0-9]+/g;
-    let str1 = str.replace(reg, "");
-    return str1;
+  if (!str) return ''
+  return str.replace(/[0-9]+/g, '')
 }
 
-const getFormatValue = (alarmType, val) => {
-    console.log(alarmType, val)
-    alarmType = deleteNum(alarmType)
-    let value = ""
-    switch (alarmType) {
-        case 'ambienttemperature':
-            value = val / 100 + " ℃"
-            break;
-        case 'BatteryVoltage':
-            value = val / 1000 + " V"
-            break;
-        case 'cablehead':
-            value = val > 0 ? '触发' : '正常'
-            break;
-        case 'cablehead_tem':
-            value = val / 100 + " ℃"
-            break;
-        case 'manholecover':
-            value = val === 1 ? '开启' : '正常'
-            break;
-        case 'signalg':
-            value = val
-            break;
-        case 'smokedetector':
-            value = val === 1 ? '触发' : '正常'
-            break;
-        case 'waterlevel':
-            value = val === 1 ? '触发' : '正常'
-            break;
-        case 'waterlevelvalue':
-            value = val + " PA"
-            break;
-    }
-    return value
-}
-
+// 获取告警类型名称
 const getAlertType = (alarmType) => {
-    var alarm_type_name = "告警信息"
-    alarmType = deleteNum(alarmType)
-    switch (alarmType) {
-        case 'ambienttemperature':
-            alarm_type_name = "环境温度告警"
-            break;
-        case 'BatteryVoltage':
-            alarm_type_name = "电池低电压告警"
-            break;
-        case 'cablehead':
-            alarm_type_name = "电缆震动感告警"
-            break;
-        case 'cablehead_tem':
-            alarm_type_name = "电缆头温度告警"
-            break;
-        case 'manholecover':
-            alarm_type_name = "电缆井井盖开启"
-            break;
-        case 'signalg':
-            alarm_type_name = "感知设备4G无信号"
-            break;
-        case 'smokedetector':
-            alarm_type_name = "烟感告警"
-            break;
-        case 'waterlevel':
-            alarm_type_name = "水浸告警"
-            break;
-        case 'waterlevelvalue':
-            alarm_type_name = "大气压告警"
-            break;
-    }
-    return alarm_type_name;
+  const typeNames = {
+    ambienttemperature: '环境温度告警',
+    BatteryVoltage: '电池低电压告警',
+    cablehead: '电缆震动感告警',
+    cablehead_tem: '电缆头温度告警',
+    manholecover: '电缆井井盖开启',
+    signal4g: '感知设备4G无信号',
+    smokedetector: '烟感告警',
+    waterlevel: '水浸告警',
+    waterlevelvalue: '大气压告警'
+  }
+  const type = deleteNum(alarmType)
+  return typeNames[type] || '告警信息'
 }
 
-const groupAlarmMessage = ref([])
-onMounted(() => {
-    getWorkOrderList()
-})
+// 显示告警列表对话框
+const showAlarmListDlg = (item) => {
+  emit('AlarmListDlg', item)
+}
 
+// 跳转到地图位置
+const goParentMapPosition = (item) => {
+  emit('goMapPosition', {
+    flydata: {
+      center: [item.longitude, item.latitude],
+      zoom: 16
+    },
+    title: item.manholeName,
+    id: item.id
+  })
+}
+
+// 获取工单列表
 const getWorkOrderList = () => {
-    getGroupAlarmMessage(-3).then(res => {
-        console.log("groupAlarmMessage:",res)
-        groupAlarmMessage.value = res.rows
-    })
+  getGroupAlarmMessage(-3).then(res => {
+    console.log("groupAlarmMessage:", res)
+    if (res.code === 200) {
+      workOrderList.value = res.rows
+    }
+  })
 }
 
+onMounted(() => {
+  getWorkOrderList()
+})
 </script>
-
-<style scoped>
-.custom-label {
-    font-weight: bold;
-    color: #409EFF;
-}
-
-.alarm-data-list {
-    height: calc(100% - 20px);
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.alarmMsg {
-    cursor: pointer;
-    margin-top: 6px;
-    border-radius: 3px;
-    padding: 4px 6px 4px 6px;
-    display: flex;
-    direction: row;
-    justify-content: space-between;
-}
-
-.alarmMsg-ambienttemperature {
-    background-color: #eee;
-    color: white;
-}
-
-:deep(.el-descriptions__body .el-descriptions__table .el-descriptions__cell) {
-    box-sizing: border-box;
-    font-size: 14px;
-    font-weight: normal;
-    line-height: 6px;
-    text-align: left;
-}
-
-:deep(.el-descriptions__body) {
-    background-color: var(--el-fill-color-blank);
-    padding: 8px 2px 2px 2px;
-}
-
-:deep(.el-descriptions--small .el-descriptions__header) {
-    margin-bottom: 4px;
-}
-
-:deep(.el-dialog__headerbtn) {
-    position: absolute;
-    top: 2px;
-    right: 0;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    background: 0 0;
-    border: none;
-    outline: 0;
-    cursor: pointer;
-    font-size: var(--el-message-close-size, 16px);
-}
-
-:deep(.el-dialog) {
-    --el-dialog-width: 50%;
-    --el-dialog-margin-top: 15vh;
-    --el-dialog-bg-color: var(--el-bg-color);
-    --el-dialog-box-shadow: var(--el-box-shadow);
-    --el-dialog-title-font-size: var(--el-font-size-large);
-    --el-dialog-content-font-size: 14px;
-    --el-dialog-font-line-height: var(--el-font-line-height-primary);
-    --el-dialog-padding-primary: 16px;
-    --el-dialog-border-radius: var(--el-border-radius-small);
-    background: var(--el-dialog-bg-color);
-    border-radius: var(--el-dialog-border-radius);
-    box-shadow: var(--el-dialog-box-shadow);
-    box-sizing: border-box;
-    margin: var(--el-dialog-margin-top, 15vh) auto 50px;
-    overflow-wrap: break-word;
-    padding: 6px 10px 14px 10px;
-    position: relative;
-    width: var(--el-dialog-width, 50%);
-}
-
-:deep(.el-dialog__header) {
-    padding-bottom: 3px;
-    border-bottom: 1px solid #ccc;
-}
-
-:deep(.el-dialog__body) {
-    color: var(--el-text-color-regular);
-    font-size: var(--el-dialog-content-font-size);
-    padding: 5px;
-}
-</style>

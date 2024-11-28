@@ -68,80 +68,74 @@ const currentDate = () => {
 
   return year + "年" + (month < 10 ? "0" + month : month) + "月" + (day < 10 ? "0" + day : day) + "日 " + weekdays[date.getDay()]
 }
+
+const activeTab = ref(0)
 </script>
 
 <template>
-  <div class="mobile-alarm-page">
+  <div class="mobile-alarm-container">
     <!-- 顶部问候 -->
-    <div class="greeting-section">
+    <div class="greeting-header">
       <div class="greeting-text">{{ greetingMessge() }}</div>
       <div class="date-text">{{ currentDate() }}</div>
     </div>
 
-    <!-- 告警概览统计 - 使用卡片网格布局 -->
-    <div class="alarm-overview-grid">
-      <SensorTypeStatistic />
-    </div>
-
-    <!-- 最新工单 -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="header-left">
-          <van-icon name="orders-o" size="20" />
-          <span>最新工单</span>
+    <!-- Tab 导航 -->
+    <van-tabs v-model:active="activeTab" sticky animated swipeable>
+      <!-- 概览 Tab -->
+      <van-tab title="告警概览">
+        <div class="tab-content">
+          <div class="alarm-overview-grid">
+            <SensorTypeStatistic />
+          </div>
+          
+          <div class="section-card">
+            <div class="section-header">
+              <van-radio-group v-model="radioRange" direction="horizontal" @change="changeRange">
+                <van-radio name="month">本月</van-radio>
+                <van-radio name="year">本年</van-radio>
+              </van-radio-group>
+            </div>
+            <AlarmTypeStatistic ref="refAlarmTypeStatistic" />
+          </div>
         </div>
-        <van-button type="primary" size="small" @click="goWorkOrderList">查看更多</van-button>
-      </div>
-      <WorkOrderList @AlarmListDlg="showAlarmList" @goMapPosition="goMapPosition" />
-    </div>
+      </van-tab>
 
-    <!-- 告警统计 -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="header-left">
-          <van-icon name="chart-trending-o" size="20" />
-          <span>告警统计</span>
+      <!-- 工单 Tab -->
+      <van-tab title="工单管理">
+        <div class="tab-content">
+          <div class="section-card">
+            <WorkOrderList 
+              @AlarmListDlg="showAlarmList" 
+              @goMapPosition="goMapPosition" 
+            />
+          </div>
         </div>
-        <van-radio-group v-model="radioRange" direction="horizontal" @change="changeRange">
-          <van-radio name="month">本月</van-radio>
-          <van-radio name="year">本年</van-radio>
-        </van-radio-group>
-      </div>
-      <AlarmTypeStatistic ref="refAlarmTypeStatistic" />
-    </div>
+      </van-tab>
 
-    <!-- 设备状态 -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="header-left">
-          <van-icon name="cluster-o" size="20" />
-          <span>设备状态</span>
+      <!-- 设备 Tab -->
+      <van-tab title="设备状态">
+        <div class="tab-content">
+          <DeviceSensorInfo />
         </div>
-      </div>
-      <DeviceSensorInfo />
-    </div>
+      </van-tab>
 
-    <!-- 告警设置 -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="header-left">
-          <van-icon name="setting-o" size="20" />
-          <span>告警设置</span>
+      <!-- 设置 Tab -->
+      <van-tab title="告警设置">
+        <div class="tab-content">
+          <AlarmConfigPanel />
+          <div class="section-card">
+            <div class="section-header">
+              <div class="header-left">
+                <van-icon name="clock-o" size="20" />
+                <span>历史告警</span>
+              </div>
+            </div>
+            <historyAlarmDataPanel />
+          </div>
         </div>
-      </div>
-      <AlarmConfigPanel />
-    </div>
-
-    <!-- 历史告警 -->
-    <div class="section-card">
-      <div class="section-header">
-        <div class="header-left">
-          <van-icon name="clock-o" size="20" />
-          <span>历史告警</span>
-        </div>
-      </div>
-      <historyAlarmDataPanel />
-    </div>
+      </van-tab>
+    </van-tabs>
 
     <!-- 告警详情弹窗 -->
     <AlarmListDlg 
@@ -153,26 +147,30 @@ const currentDate = () => {
 </template>
 
 <style scoped>
-.mobile-alarm-page {
-  background-color: #f7f8fa;
+.mobile-alarm-container {
   min-height: 100vh;
-  padding: 16px;
-}
-
-.greeting-section {
-  margin-bottom: 20px;
+  background-color: #f7f8fa;
   color: #323233;
 }
 
+.greeting-header {
+  padding: 16px 16px 0;
+}
+
 .greeting-text {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 4px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #323233;
 }
 
 .date-text {
   font-size: 14px;
   color: #969799;
+  margin-top: 4px;
+}
+
+.tab-content {
+  padding: 16px;
 }
 
 .alarm-overview-grid {
@@ -221,37 +219,103 @@ const currentDate = () => {
   height: 32px;
 }
 
+:deep(.van-tabs__wrap) {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  background: #fff;
+}
+
+:deep(.van-tabs__content) {
+  background: #f7f8fa;
+}
+
 /* 暗色模式适配 */
 @media (prefers-color-scheme: dark) {
-  .mobile-alarm-page {
+  .mobile-alarm-container {
     background-color: #1c1c1e;
-  }
-
-  .section-card {
-    background: #2c2c2e;
+    color: #f5f5f5;
   }
 
   .greeting-text {
-    color: #fff;
+    color: #f5f5f5;
+  }
+
+  .date-text {
+    color: #969799;
+  }
+
+  .alarm-overview-grid,
+  .section-card {
+    background: #2c2c2e;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   }
 
   .header-left {
-    color: #fff;
+    color: #f5f5f5;
+  }
+
+  :deep(.van-tabs__wrap) {
+    background: #1c1c1e;
+  }
+  
+  :deep(.van-tabs__content) {
+    background: #1c1c1e;
+  }
+
+  :deep(.van-tab) {
+    color: #f5f5f5;
+  }
+
+  :deep(.van-tab--active) {
+    color: var(--van-primary-color);
+  }
+
+  :deep(.van-tabs__line) {
+    background-color: var(--van-primary-color);
+  }
+
+  :deep(.van-radio__label) {
+    color: #f5f5f5;
+  }
+
+  :deep(.van-radio__icon) {
+    border-color: #606060;
+  }
+
+  :deep(.van-radio__icon--checked) {
+    border-color: var(--van-primary-color);
+    background-color: var(--van-primary-color);
   }
 }
 
-/* 小屏幕适配 */
-@media screen and (max-width: 320px) {
-  .mobile-alarm-page {
-    padding: 12px;
-  }
+/* 调整工单Tab的样式 */
+.tab-content .section-card:only-child {
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
 
-  .greeting-text {
-    font-size: 20px;
-  }
+/* 优化Tab样式 */
+:deep(.van-tabs__wrap) {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
 
-  .section-card {
-    padding: 12px;
-  }
+:deep(.van-tab) {
+  padding: 12px 0;
+  font-size: 14px;
+}
+
+:deep(.van-tab--active) {
+  font-weight: 600;
 }
 </style>
+<route lang="json">
+    {
+        "name":"cableAlarm",
+        "meta":{
+            "title":"在线监测"
+        }
+    }
+</route>
