@@ -24,15 +24,15 @@ const loadmap = (jsonfile) => {
     domMap.style.width = '100%';
     domMap.style.height = '75vh';
     
-    console.log(`./assets/data/${jsonfile}_full.json`)
     nextTick(() => {
+        console.log(`/assets/data/${jsonfile}_full.json`)
         mapchart = echarts.init(domMap);
         mapchart.showLoading();
-        fetch(`./assets/data/${jsonfile}_full.json`).then(res => {
+        fetch(`/assets/data/${jsonfile}_full.json`).then(res => {
         return res.json()
     }).then(data => {
         echarts.registerMap('mapdata', data);
-        fetch(`./assets/data/${jsonfile}_value.json`).then(res => {
+        fetch(`/assets/data/${jsonfile}_value.json`).then(res => {
             return res.json()
         }).then(val => {
             mapchart.hideLoading();

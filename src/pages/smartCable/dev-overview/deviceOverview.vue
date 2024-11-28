@@ -2,7 +2,7 @@
 import * as eCharts from 'echarts'
 import EchartMap from '@/components/smart-cable/dev-overview/EchartMap.vue'
 import { transformerSubstationIcon } from '@/components/icon'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import { cableStatistic, channelStatistic, feederLineStatistic, substationStatistic } from '@/api/device-overview'
 import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler'
 
@@ -14,38 +14,89 @@ const substationStatisticData = ref(null)
 const feederLineStatisticData = ref(null)
 const cableStatisticData = ref(null)
 const channelStatisticData = ref(null)
-onMounted(() => {
-  mockLogin() // 手动模拟admin登录
-  substationStatistic().then((res) => {
-    substationStatisticData.value = res.data
-    console.log('substationStatisticData:', res.data)
-  })
-  feederLineStatistic().then((res) => {
-    feederLineStatisticData.value = res.data
-    console.log('feederLineStatisticData:', res.data)
-    option_line.value.series[0].data[0].value = feederLineStatisticData?.value.erectionMethod[3].total
-    option_line.value.series[0].data[1].value = feederLineStatisticData?.value.erectionMethod[2].total
-    option_line.value.series[0].data[2].value = feederLineStatisticData?.value.erectionMethod[0].total
-    console.log('option_line:', option_line.value)
-    chart_line.value.setOption(option_line.value, true)
-  })
-  cableStatistic().then((res) => {
-    cableStatisticData.value = res.data
-    option_cable.value.series[0].data[0].value = cableStatisticData?.value.cableSectionCount
-    option_cable.value.series[0].data[1].value = cableStatisticData?.value.cableJointCount
-    option_cable.value.series[0].data[2].value = cableStatisticData?.value.cableTerminationCount
-    chart_cable.value.setOption(option_cable.value, true)
-    console.log('cableStatisticData:', res.data)
-  })
-  channelStatistic().then((res) => {
-    channelStatisticData.value = res.data
-    option_channel.value.series[0].data[0].value = channelStatisticData?.value.cablePipeSectionLength / 1000
-    option_channel.value.series[0].data[1].value = channelStatisticData?.value.cableTunnelSectionLength / 1000
-    option_channel.value.series[0].data[2].value = channelStatisticData?.value.utilityTunnelLength / 1000
-    chart_channel.value.setOption(option_channel.value, true)
-    console.log('channelStatisticData:', res.data)
-  })
+onMounted(async () => {
+  try {
+    await mockLogin()
+    
+    const [substationData, feederData, cableData, channelData] = await Promise.all([
+      substationStatistic(),
+      feederLineStatistic(),
+      cableStatistic(), 
+      channelStatistic()
+    ])
+
+    // 安全地设置数据
+    substationStatisticData.value = substationData.data
+    feederLineStatisticData.value = feederData.data
+    cableStatisticData.value = cableData.data
+    channelStatisticData.value = channelData.data
+
+    // 更新电缆统计数据
+    if (cableStatisticData.value) {
+      // 更新电缆状态统计
+      cableItemStatisticData.value.cableStateCount = cableStatisticData.value.state.map(item => ({
+        total: item.total,
+        title: item.psrStateName,
+        color: getStateColor(item.psrStateName)
+      }))
+
+      // 更新电缆段状态统计
+      cableItemStatisticData.value.cableSectionState = Object.entries(cableStatisticData.value.cableSectionStateObj).map(([key, value]) => ({
+        total: value,
+        title: key,
+        color: getStateColor(key)
+      }))
+
+      // 更新中间接头状态统计
+      cableItemStatisticData.value.cableJointStateCount = Object.entries(cableStatisticData.value.cableJointStateCountObj).map(([key, value]) => ({
+        total: value,
+        title: key,
+        color: getStateColor(key)
+      }))
+
+      // 更新电缆终端状态统计
+      cableItemStatisticData.value.cableTerminationStateCount = Object.entries(cableStatisticData.value.cableTerminationStateCountObj).map(([key, value]) => ({
+        total: value,
+        title: key,
+        color: getStateColor(key)
+      }))
+    }
+
+    // 根据display属性初始化相应的图表
+    if (props.display === 'right') {
+      initChart_cable()
+      initChart_channel()
+      
+      // 安全地更新cable图表数据
+      if (chart_cable.value && cableStatisticData.value) {
+        option_cable.value.series[0].data[0].value = cableStatisticData.value.cableSectionCount || 0
+        option_cable.value.series[0].data[1].value = cableStatisticData.value.cableJointCount || 0
+        option_cable.value.series[0].data[2].value = cableStatisticData.value.cableTerminationCount || 0
+        chart_cable.value.setOption(option_cable.value, true)
+      }
+      
+      // channel图表的数据更新将由watch处理
+    }
+  } catch (error) {
+    console.error('Error:', error)
+  }
 })
+
+// 添加一个辅助函数来获取状态对应的颜色
+function getStateColor(state) {
+  switch (state) {
+    case '在运':
+      return '#32CD32'
+    case '未投运':
+      return '#1E90FF'
+    case '退役':
+      return '#A52A2A'
+    case '现场留用':
+      return '#FFA500'  // 橙色
+    default:
+      return '#808080'  // 灰色作为默认颜色
+  }
+}
 
 // 配网线路总条数,混合线路条数,电缆线路条数,架空线路条数
 const chart_line = ref(null)
@@ -153,13 +204,17 @@ const chart_channel = ref(null)
 const option_channel = ref({
   tooltip: {
     trigger: 'item',
+    formatter: function(params) {
+      return `${params.name}: ${params.value}KM (${params.percent}%)`
+    }
   },
   legend: {
     top: '3%',
+    formatter: '{name}'
   },
   series: [
     {
-      name: '电缆',
+      name: '电缆通道',
       type: 'pie',
       center: ['50%', '55%'],
       radius: ['30%', '70%'],
@@ -171,13 +226,11 @@ const option_channel = ref({
         fontSize: '20px',
         fontWeight: 'bolder',
         position: 'inside',
-        formatter: '{b}\n{c}KM\n{d}%',
+        formatter: function(params) {
+          return `${params.name}\n${params.value}KM\n${params.percent}%`
+        }
       },
-      data: [
-        { value: 0, name: '排管' },
-        { value: 0, name: '隧道' },
-        { value: 0, name: '管廊' },
-      ],
+      data: [], // 初始化为空数组
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
@@ -213,32 +266,113 @@ onMounted(() => {
 // 动态生成统计组件数据
 const cableItemStatisticData = ref({
   cableStateCount: [
-    { total: undefined, title: '在运', color: '#32CD32' },
-    { total: undefined, title: '未投运', color: '#1E90FF' },
-    { total: undefined, title: '退役', color: '#A52A2A' },
+    { total: 0, title: '在运', color: '#32CD32' },
+    { total: 0, title: '未投运', color: '#1E90FF' },
+    { total: 0, title: '退役', color: '#A52A2A' },
   ],
   cableSectionState: [
-    { total: undefined, title: '在运', color: '#32CD32' },
-    { total: undefined, title: '未投运', color: '#1E90FF' },
-    { total: undefined, title: '退役', color: '#A52A2A' },
+    { total: 0, title: '在运', color: '#32CD32' },
+    { total: 0, title: '未投运', color: '#1E90FF' },
+    { total: 0, title: '退役', color: '#A52A2A' },
   ],
   cableJointStateCount: [
-    { total: undefined, title: '在运', color: '#32CD32' },
-    { total: undefined, title: '未投运', color: '#1E90FF' },
-    { total: undefined, title: '退役', color: '#A52A2A' },
+    { total: 0, title: '在运', color: '#32CD32' },
+    { total: 0, title: '未投运', color: '#1E90FF' },
+    { total: 0, title: '退役', color: '#A52A2A' },
   ],
   cableTerminationStateCount: [
-    { total: undefined, title: '在运', color: '#32CD32' },
-    { total: undefined, title: '未投运', color: '#1E90FF' },
-    { total: undefined, title: '退役', color: '#A52A2A' },
+    { total: 0, title: '在运', color: '#32CD32' },
+    { total: 0, title: '未投运', color: '#1E90FF' },
+    { total: 0, title: '退役', color: '#A52A2A' },
   ],
 })
-const cableStatisticItems = ref([
-  { label: '电缆', states: cableItemStatisticData.value?.cableStateCount },
-  { label: '电缆段', states: cableItemStatisticData.value?.cableSectionState },
-  { label: '中间接头', states: cableItemStatisticData.value?.cableJointStateCount },
-  { label: '电缆终端', states: cableItemStatisticData.value?.cableTerminationStateCount },
+const cableStatisticItems = computed(() => [
+  { label: '电缆', states: cableItemStatisticData.value.cableStateCount },
+  { label: '电缆段', states: cableItemStatisticData.value.cableSectionState },
+  { label: '中间接头', states: cableItemStatisticData.value.cableJointStateCount },
+  { label: '电缆终端', states: cableItemStatisticData.value.cableTerminationStateCount },
 ])
+
+// 添加排序功能的 computed 属性
+const sortedCableStatisticItems = computed(() => {
+  return cableStatisticItems.value.map(item => {
+    // 对每个设备的状态数组进行排序
+    const sortedStates = [...item.states].sort((a, b) => b.total - a.total)
+    return {
+      ...item,
+      states: sortedStates
+    }
+  })
+})
+
+// 修改 channelChartData computed 属性
+const channelChartData = computed(() => {
+  if (!channelStatisticData.value) return []
+  
+  return [
+    { 
+      value: parseFloat((channelStatisticData.value.cablePipeSectionLength / 1000).toFixed(2)),
+      name: '排管'
+    },
+    { 
+      value: parseFloat((channelStatisticData.value.cableTunnelSectionLength / 1000).toFixed(2)),
+      name: '隧道'
+    },
+    { 
+      value: parseFloat((channelStatisticData.value.utilityTunnelLength / 1000).toFixed(2)),
+      name: '管廊'
+    }
+  ]
+})
+
+// 修改 watch 部分
+watch(channelChartData, (newData) => {
+  if (chart_channel.value && newData.length > 0) {
+    // 直接设置新的配置
+    chart_channel.value.setOption({
+      series: [{
+        ...option_channel.value.series[0], // 保持其他配置不变
+        data: newData
+      }]
+    })
+  }
+}, { deep: true, immediate: true })
+
+// 修改 getTooltipText 计算属性
+const getTooltipText = computed(() => (label, state) => {
+  let text = []
+  text.push(`<div class="tooltip-title">${label}统计信息</div>`)
+  text.push(`<div class="tooltip-content">`)
+  text.push(`<div class="tooltip-item"><span class="label">状态:</span><span class="value" style="color:${state.color}">${state.title}</span></div>`)
+  text.push(`<div class="tooltip-item"><span class="label">数量:</span><span class="value">${state.total}</span></div>`)
+  
+  // 根据不同类型添加额外信息
+  switch(label) {
+    case '电缆':
+      if (cableStatisticData.value?.cableLength) {
+        text.push(`<div class="tooltip-item"><span class="label">总长度:</span><span class="value">${(cableStatisticData.value.cableLength / 1000).toFixed(2)}KM</span></div>`)
+      }
+      break
+    case '电缆段':
+      if (cableStatisticData.value?.cableSectionCount) {
+        text.push(`<div class="tooltip-item"><span class="label">总数量:</span><span class="value">${cableStatisticData.value.cableSectionCount}</span></div>`)
+      }
+      break
+    case '中间接头':
+      if (cableStatisticData.value?.cableJointCount) {
+        text.push(`<div class="tooltip-item"><span class="label">总数量:</span><span class="value">${cableStatisticData.value.cableJointCount}</span></div>`)
+      }
+      break
+    case '电缆终端':
+      if (cableStatisticData.value?.cableTerminationCount) {
+        text.push(`<div class="tooltip-item"><span class="label">总数量:</span><span class="value">${cableStatisticData.value.cableTerminationCount}</span></div>`)
+      }
+      break
+  }
+  text.push(`</div>`)
+  
+  return text.join('')
+})
 </script>
 
 <template>
@@ -398,46 +532,32 @@ const cableStatisticItems = ref([
           <div class="list-content">
             <div class="statisticPieChart_cable" />
 
-            <div style="display:flex;flex-direction: row;margin-bottom: 10px;justify-content: center;">
-              <div
-                style="background-color: #32CD32;padding:1px 10px;border-radius: 4px;margin-right: 10px;color:white"
-              >
-                在运
-              </div>
-              <div
-                style="background-color: #1E90FF;padding:1px 10px;border-radius: 4px;margin-right: 10px;color:white"
-              >
-                未投运
-              </div>
-              <div
-                style="background-color: #A52A2A;padding:1px 10px;border-radius: 4px;margin-right: 10px;color:white"
-              >
-                退役
-              </div>
+            <div class="status-legend">
+              <div class="legend-item running">在运</div>
+              <div class="legend-item pending">未投运</div>
+              <div class="legend-item retired">退役</div>
+              <div class="legend-item onsite">现场留用</div>
             </div>
-            <div>
+
+            <div class="statistics-list">
               <div
-                v-for="(item, index) in cableStatisticItems" :key="index"
-                style="border:1px solid lightgray;display:flex;flex-direction: row;border-radius: 5px;margin-top:4px;"
+                v-for="(item, index) in sortedCableStatisticItems"
+                :key="index"
+                class="statistic-item"
               >
-                <div class="label-box">
-                  {{ item.label }}
-                </div>
-                <div style="display:flex;flex-direction: row;width:100%">
+                <div class="item-label">{{ item.label }}</div>
+                <div class="item-states">
                   <div
-                    v-for="(state, stateIndex) in item.states" :key="stateIndex"
-                    :title="state.title" :style="{
+                    v-for="(state, stateIndex) in item.states"
+                    :key="stateIndex"
+                    :data-tooltip="getTooltipText(item.label, state)"
+                    class="state-box"
+                    :class="[`state-${state.title}`]"
+                    :style="{
                       width: stateIndex === 0 ? '40%' : '30%',
-                      backgroundColor: state.color,
-                      textAlign: 'center',
-                      color: 'white',
-                      borderTopLeftRadius: stateIndex === 0 ? '5px' : '0',
-                      borderBottomLeftRadius: stateIndex === 0 ? '5px' : '0',
-                      borderTopRightRadius: stateIndex === item.states.length - 1 ? '5px' : '0',
-                      borderBottomRightRadius: stateIndex === item.states.length - 1 ? '5px' : '0',
                     }"
                   >
-                    {{ state.total }}
+                    {{ state.total || 0 }}
                   </div>
                 </div>
               </div>
@@ -551,6 +671,192 @@ const cableStatisticItems = ref([
   margin-left: 2px;
   margin-right: 2px;
   width: 75px;
+}
+
+.state-box {
+  text-align: center;
+  color: white;
+  cursor: help;
+  transition: all 0.3s ease;
+  padding: 4px 0;
+}
+
+.state-box:hover {
+  opacity: 0.8;
+  transform: scale(1.02);
+}
+
+/* 添加自定义tooltip样式 */
+.state-box[title] {
+  position: relative;
+}
+
+.state-box[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: pre-line;
+  z-index: 1000;
+}
+
+.status-legend {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: default;
+  min-width: 70px;
+  text-align: center;
+}
+
+.legend-item.running { background-color: #32CD32; }
+.legend-item.pending { background-color: #1E90FF; }
+.legend-item.retired { background-color: #A52A2A; }
+.legend-item.onsite { background-color: #FFA500; }
+
+/* 统计列表样式 */
+.statistics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.statistic-item {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 20px;
+}
+
+.item-label {
+  width: 65px;
+  padding: 2px 6px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.item-states {
+  display: flex;
+  flex: 1;
+  height: 100%;
+}
+
+.state-box {
+  text-align: center;
+  color: white;
+  padding: 2px 1px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state-box:hover {
+  filter: brightness(1.1);
+}
+
+.state-在运 { background-color: #32CD32; }
+.state-未投运 { background-color: #1E90FF; }
+.state-退役 { background-color: #A52A2A; }
+.state-现场留用 { background-color: #FFA500; }
+
+/* 自定义tooltip样式 */
+.state-box[data-tooltip]:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0;
+  background: rgba(24, 36, 51, 0.95);
+  color: white;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: normal;
+  white-space: normal;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  min-width: 220px;
+}
+
+/* 添加新的 tooltip 内部样式 */
+:deep(.tooltip-title) {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+:deep(.tooltip-content) {
+  padding: 6px 10px;
+}
+
+:deep(.tooltip-item) {
+  padding: 3px 0;
+  font-size: 12px;
+}
+
+/* 修改箭头样式 */
+.state-box[data-tooltip]:hover::after {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: rgba(24, 36, 51, 0.95);
+  z-index: 1000;
+}
+
+/* 修改图例样式使其更紧凑 */
+.status-legend {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: default;
+  min-width: 60px;
+  text-align: center;
 }
 </style>
 <route lang="json">

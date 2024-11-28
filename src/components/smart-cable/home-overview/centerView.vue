@@ -111,11 +111,11 @@ const loadmap = (jsonfile) => {
         });
 
         mapchart.showLoading();
-        fetch('./assets/data/' + jsonfile + "_full.json")
+        fetch(`./assets/data/${jsonfile}_full.json`)
             .then(res => res.json())
             .then(data => {
                 echarts.registerMap('mapdata', data);
-                fetch('./assets/data/' + jsonfile + "_value.json")
+                fetch(`./assets/data/${jsonfile}_value.json`)
                     .then(res => res.json())
                     .then(val => {
                         mapchart.hideLoading();
