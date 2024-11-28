@@ -30,6 +30,9 @@ const onSelect = (action) => {
         case '视频监控':
             toVideoMonitor();
             break;
+        case '返回首页':
+            toHome();
+            break;
         default:
             break;
     }
@@ -38,12 +41,15 @@ const toOverview = () => {
     router.push('/smartCable');
 };
 const toDeviceOverview = () => {
-    router.push('/smartCable/deviceOverview');
+    router.push('/smartCable/dev-overview');
 };
 const toVideoMonitor = () => {
-    router.push('/smartCable/videoMonitor');
+    router.push('/smartCable/video-surveillance');
 };
-const offset = ref({ x: 50, y: 200 });
+const toHome = () => {
+    router.push('/');
+};
+const offset = ref({ x: 50, y: 300 });
 
 // 气泡弹窗
 const showPopover = ref(false);
@@ -51,6 +57,7 @@ const actions = [
     { text: '总览', icon: 'add-o' },
     { text: '设备概览', icon: 'music-o' },
     { text: '视频监控', icon: 'more-o' },
+    { text: '返回首页', icon: 'home-o' },
 ];
 </script>
 <style>

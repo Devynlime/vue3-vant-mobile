@@ -31,6 +31,8 @@ export default antfu(
       'src/components/smart-cable/**',
       'src/pages/smartCable/**',
       '**/*.js',
+      'public/assets/data/*_full.json',
+      'public/assets/data/*_value.json',
     ],
   },
 )
