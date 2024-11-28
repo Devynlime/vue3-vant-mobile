@@ -20,10 +20,12 @@
                 <el-input v-model="formData.lowerLimitAlert"></el-input>
             </el-form-item>
         </el-form>
-        <div slot="footer" style="justify-content: end;display: flex;">
-            <el-button @click="closeDialog">取消</el-button>
-            <el-button type="primary" @click="submitForm">确定</el-button>
-        </div>
+        <template #footer>
+            <div style="justify-content: end;display: flex;">
+                <el-button @click="closeDialog">取消</el-button>
+                <el-button type="primary" @click="submitForm">确定</el-button>
+            </div>
+        </template>
     </el-dialog>
 </template>
 

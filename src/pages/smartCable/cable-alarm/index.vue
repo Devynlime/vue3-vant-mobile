@@ -120,19 +120,19 @@ const activeTab = ref(0)
         </div>
       </van-tab>
 
+      <!-- 历史告警 Tab (新增) -->
+      <van-tab title="历史告警">
+        <div class="tab-content">
+          <div class="section-card">
+            <historyAlarmDataPanel />
+          </div>
+        </div>
+      </van-tab>
+
       <!-- 设置 Tab -->
       <van-tab title="告警设置">
         <div class="tab-content">
           <AlarmConfigPanel />
-          <div class="section-card">
-            <div class="section-header">
-              <div class="header-left">
-                <van-icon name="clock-o" size="20" />
-                <span>历史告警</span>
-              </div>
-            </div>
-            <historyAlarmDataPanel />
-          </div>
         </div>
       </van-tab>
     </van-tabs>
