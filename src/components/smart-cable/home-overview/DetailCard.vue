@@ -1,56 +1,59 @@
 <template>
     <div class="detail-card">
-        <el-row :gutter="0">
-            <el-col :span="12" :offset="6">
-                <p class="title-box">{{ props.cardTitle }}</p>
-            </el-col>
-        </el-row>
+        <!-- 标题部分 -->
+        <div class="card-header">
+            <div class="title-box">{{ cardTitle }}</div>
+        </div>
 
-        <el-row :gutter="0">
-            <el-col :span="12">
-                总数量 <span class="info-value">{{ data.total }}</span> {{ props.totalUnit }}
-            </el-col>
-            <el-col :span="12" v-if="props.type == 'cable'">
-                总长度 <span class="info-value">{{ data.totalLength }}</span> km
-            </el-col>
-        </el-row>
+        <!-- 网格布局内容区 -->
+        <div class="card-content">
+            <!-- 总数据行 -->
+            <div class="grid-row summary-row">
+                <div class="grid-cell">
+                    总数量 <span class="info-value">{{ data.total }}</span> {{ totalUnit }}
+                </div>
+                <div class="grid-cell" v-if="type === 'cable'">
+                    总长度 <span class="info-value">{{ data.totalLength }}</span> km
+                </div>
+            </div>
 
-        <el-row :gutter="0">
-            <el-col :span="12">
-                <span class="tag-running"> {{ tag[0] }} </span> <span class="info-value">{{ data.running }}</span> 条
-                <span class="info-value">{{ (data.running / data.total * 100).toFixed(2) }}</span> %
-            </el-col>
-            <el-col :span="12">
-                <span class="tag-fault"> {{ tag[1] }} </span> <span class="info-value">{{ data.fault }}</span> 条 <span
-                    class="info-value">{{ (data.fault / data.total * 100).toFixed(2) }}</span> %
-            </el-col>
-        </el-row>
-
-        <el-row :gutter="0">
-            <el-col :span="12">
-                <span class="tag-maintenance"> {{ tag[2] }} </span> <span class="info-value">{{ data.maintenance
-                    }}</span> 条 <span class="info-value">{{ (data.maintenance / data.total * 100).toFixed(2) }}</span> %
-            </el-col>
-            <el-col :span="12">
-                <span class="tag-construction"> {{ tag[3] }} </span> <span class="info-value">{{ data.construction
-                    }}</span> 条
-                <span class="info-value">{{ (data.construction / data.total * 100).toFixed(2) }}</span> %
-            </el-col>
-        </el-row>
-
-        <el-row :gutter="0">
-            <el-col :span="12">
-                <span class="tag-outage"> {{ tag[4] }} </span> <span class="info-value">{{ data.outage }}</span> 条 <span
-                    class="info-value">{{ (data.outage / data.total * 100).toFixed(2) }}</span>%
-            </el-col>
-            <el-col :span="12">
-                <span class="tag-other"> {{ tag[5] }} </span> <span class="info-value">{{ data.other }}</span> 条 <span
-                    class="info-value">{{ (data.other / data.total * 100).toFixed(2) }}</span>%
-            </el-col>
-        </el-row>
-
+            <!-- 状态数据网格 -->
+            <div class="status-grid">
+                <div class="grid-cell">
+                    <span class="tag-running">{{ tag[0] }}</span>
+                    <span class="info-value">{{ data.running }}</span>条
+                    <span class="info-value">{{ calculatePercentage(data.running, data.total) }}</span>%
+                </div>
+                <div class="grid-cell">
+                    <span class="tag-fault">{{ tag[1] }}</span>
+                    <span class="info-value">{{ data.fault }}</span>条
+                    <span class="info-value">{{ calculatePercentage(data.fault, data.total) }}</span>%
+                </div>
+                <div class="grid-cell">
+                    <span class="tag-maintenance">{{ tag[2] }}</span>
+                    <span class="info-value">{{ data.maintenance }}</span>条
+                    <span class="info-value">{{ calculatePercentage(data.maintenance, data.total) }}</span>%
+                </div>
+                <div class="grid-cell">
+                    <span class="tag-construction">{{ tag[3] }}</span>
+                    <span class="info-value">{{ data.construction }}</span>条
+                    <span class="info-value">{{ calculatePercentage(data.construction, data.total) }}</span>%
+                </div>
+                <div class="grid-cell">
+                    <span class="tag-outage">{{ tag[4] }}</span>
+                    <span class="info-value">{{ data.outage }}</span>条
+                    <span class="info-value">{{ calculatePercentage(data.outage, data.total) }}</span>%
+                </div>
+                <div class="grid-cell">
+                    <span class="tag-other">{{ tag[5] }}</span>
+                    <span class="info-value">{{ data.other }}</span>条
+                    <span class="info-value">{{ calculatePercentage(data.other, data.total) }}</span>%
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
 <script setup>
 import { onMounted, reactive, ref, watch } from 'vue';
 
@@ -67,29 +70,16 @@ const props = defineProps({
         type: String,
         default: 'cable'
     },
-    data: Object,
-})
-
-watch( props.data, (newVal, oldVal) => {
-    let {total, totalLength, details} = newVal;
-    let inData = {total,totalLength,...details};
-    initFromObject(inData);
-    // console.log('data changed', props.data,"💛",inData,details);
-})
+    data: {
+        type: Object,
+        required: true
+    }
+});
 
 // 字段标签
 const tag = ref(['运行', '告警', '维护', '施工', '停运', '退役']);
-
 const tag_default = ['运行', '告警', '维护', '施工', '停运', '退役'];
 const tag_tube = ['占用', '规设', '空余', '施工', '停运', '其他'];
-
-onMounted(() => {
-    if (props.type == 'tube') {
-        tag.value = tag_tube;
-    } else {
-        tag.value = tag_default;
-    }
-})
 
 const data = reactive({
     total: 0,
@@ -100,73 +90,120 @@ const data = reactive({
     construction: 0,
     outage: 0,
     other: 0,
-})
+});
 
 const initFromObject = (inData) => {
-    // 「方式1️⃣」
-    // inData: [数量,长度 ,状态1, 状态2, 状态3, 状态4, 状态5, 状态6]
-    // data.total = inData[0];
-    // data.totalLength = inData[1];
-    // data.running = inData[2];
-    // data.fault = inData[3];
-    // data.maintenance = inData[4];
-    // data.construction = inData[5];
-    // data.outage = inData[6];
-    // data.other = inData[7];
+    if (!inData) return;
+    
+    data.total = inData.total || 0;
+    data.totalLength = inData.totalLength || 0;
+    data.running = inData.running || 0;
+    data.fault = inData.fault || 0;
+    data.maintenance = inData.maintenance || 0;
+    data.construction = inData.construction || 0;
+    data.outage = inData.outage || 0;
+    data.other = inData.other || 0;
+};
 
-    // 「方式2️⃣」
-    data.total = inData.total;
-    data.totalLength = inData.totalLength;
-    // let status = inData.details;
-    // console.log('status:', inData,status);
-    data.running = inData.running;
-    data.fault = inData.fault;
-    data.maintenance = inData.maintenance;
-    data.construction = inData.construction;
-    data.outage = inData.outage;
-    data.other = inData.other;
-    // console.log('data:💢', data);
-}
+watch(() => props.data, (newVal) => {
+    if (newVal) {
+        const { total, totalLength, details } = newVal;
+        const inData = { total, totalLength, ...details };
+        initFromObject(inData);
+    }
+}, { deep: true });
 
 onMounted(() => {
-    // initFromObject(props.data);  // 测试的时候注释掉
-
-    const mockData = {
-        total: 1298,
-        totalLength: 128821,
-        running: 698,
-        fault: 120,
-        maintenance: 120,
-        construction: 120,
-        outage: 120,
-        other: 110,
+    if (props.type === 'tube') {
+        tag.value = tag_tube;
+    } else {
+        tag.value = tag_default;
     }
 
-    initFromObject(mockData);
+    if (props.data) {
+        initFromObject(props.data);
+    } else {
+        // Mock data for testing
+        const mockData = {
+            total: 1298,
+            totalLength: 128821,
+            running: 698,
+            fault: 120,
+            maintenance: 120,
+            construction: 120,
+            outage: 120,
+            other: 110,
+        };
+        initFromObject(mockData);
+    }
+});
 
-    // if(props!=undefined){
-    //     initFromObject(props.data);
-    // }
-})
-
+// 添加一个安全的百分比计算方法
+const calculatePercentage = (value, total) => {
+    if (!total || total === 0) return '0.00';
+    return ((value / total) * 100).toFixed(2);
+};
 </script>
+
 <style scoped>
 .detail-card {
+    width: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 15px;
+    padding: 10px;
+    box-sizing: border-box;
     color: rgb(37, 31, 31);
     font-weight: 700;
+    background-color: var(--el-bg-color);
+    border-radius: 4px;
+    box-shadow: var(--el-box-shadow-light);
+}
+
+.card-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
 }
 
 .title-box {
+    grid-column: 2 / 3;
     height: 2rem;
     background-color: #3c8b9a;
     color: white;
     padding: 10px;
     font-size: 16px;
     font-weight: bold;
-    /* 水平居中 */
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 4px;
+}
+
+.card-content {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 15px;
+}
+
+.summary-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.grid-cell {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    background-color: rgba(60, 139, 154, 0.05);
+    border-radius: 4px;
 }
 
 /* 标签样式 */
@@ -175,7 +212,6 @@ onMounted(() => {
     padding: 2px 5px;
     border-radius: 5px;
     font-weight: bold;
-
 }
 
 .tag-fault {
@@ -183,16 +219,13 @@ onMounted(() => {
     padding: 2px 5px;
     border-radius: 5px;
     font-weight: bold;
-
 }
 
 .tag-maintenance {
-    /* color: rgb(255, 255, 0); */
     color: rgb(217 199 62);
     padding: 2px 5px;
     border-radius: 5px;
     font-weight: bold;
-
 }
 
 .tag-construction {
@@ -200,7 +233,6 @@ onMounted(() => {
     padding: 2px 5px;
     border-radius: 5px;
     font-weight: bold;
-
 }
 
 .tag-outage {
@@ -208,7 +240,6 @@ onMounted(() => {
     padding: 2px 5px;
     border-radius: 5px;
     font-weight: bold;
-
 }
 
 .tag-other {
@@ -216,12 +247,33 @@ onMounted(() => {
     padding: 2px 5px;
     border-radius: 5px;
     font-weight: bold;
-
 }
 
 .info-value {
     color: orange;
     font-weight: bold;
     margin: 0 5px;
+}
+
+@media screen and (max-width: 768px) {
+    .detail-card {
+        gap: 10px;
+        padding: 5px;
+    }
+
+    .status-grid {
+        gap: 5px;
+    }
+
+    .grid-cell {
+        padding: 5px;
+        font-size: 14px;
+    }
+
+    .title-box {
+        font-size: 14px;
+        padding: 8px;
+        height: 2rem;
+    }
 }
 </style>

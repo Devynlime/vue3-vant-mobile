@@ -20,7 +20,7 @@
             <div class="affix-container">
                 <el-row :gutter="0" >
 
-                    <!-- 左⬅️ -->
+                    <!-- ⬅️ -->
                     <el-col :span="6" style="padding-left: 10px;">
                         <el-card style="background-color: #fff; border: 1px solid #ccc; height: 100%">
                             <DetailCard :card-title="titles[0]" :data="lineData"/>
@@ -30,18 +30,31 @@
                             <DetailCard :card-title="titles[2]" :data="cableEndData" total-unit="个" type="cable-ends"  />
 
                             <!-- 饼图 -->
-                            <el-row :gutter="4" style="margin: 6.2rem 0 0 0;">
-                                <el-col :span="8">
-                                    <PieChartCard pie-id="chart1" :title="titles[0]"
-                                        :values="Object.values(lineData.details)" />
-                                </el-col>
-                                <el-col :span="8">
-                                    <PieChartCard pie-id="chart2" :title="titles[1]"
-                                        :values="Object.values(segmentData.details)" />
-                                </el-col>
-                                <el-col :span="8">
-                                    <PieChartCard pie-id="chart3" :title="titles[2]"
-                                        :values="Object.values(cableEndData.details)" />
+                            <el-row :gutter="8" class="chart-row">
+                                <el-col :span="24">
+                                    <el-row :gutter="8">
+                                        <el-col :span="8">
+                                            <PieChartCard 
+                                                pie-id="chart1" 
+                                                :title="titles[0]"
+                                                :values="Object.values(lineData.details)" 
+                                            />
+                                        </el-col>
+                                        <el-col :span="8">
+                                            <PieChartCard 
+                                                pie-id="chart2" 
+                                                :title="titles[1]"
+                                                :values="Object.values(segmentData.details)" 
+                                            />
+                                        </el-col>
+                                        <el-col :span="8">
+                                            <PieChartCard 
+                                                pie-id="chart3" 
+                                                :title="titles[2]"
+                                                :values="Object.values(cableEndData.details)" 
+                                            />
+                                        </el-col>
+                                    </el-row>
                                 </el-col>
                             </el-row>
                         </el-card>
@@ -274,5 +287,19 @@ onMounted(() => {
     border: 1px solid var(--vt-c-divider-light-2);
     box-shadow: 1px 1px 4px black;
     border-radius: 4px;
+}
+
+.chart-row {
+    margin: 16px 0;
+    
+    :deep(.el-col) {
+        margin-bottom: 8px;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .chart-row :deep(.el-col) {
+        width: 100% !important;
+    }
 }
 </style>
