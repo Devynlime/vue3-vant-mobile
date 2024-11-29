@@ -7,7 +7,7 @@
         <DetailCard :card-title="titles[2]" :data="cableEndData" total-unit="个" type="cable-ends" />
 
         <!-- 饼图 -->
-        <el-row :gutter="4" style="margin: 0rem 0 0 0;">
+        <el-row :gutter="4" style="margin: 1rem 0 0 0;">
             <el-col :xs="24" :sm="24" :md="8" class="chart-col">
                 <PieChartCard pie-id="chart1" :title="titles[0]" :values="Object.values(lineData.details)" />
             </el-col>

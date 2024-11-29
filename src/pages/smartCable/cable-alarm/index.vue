@@ -9,6 +9,7 @@ import WorkOrderList from '@/components/smart-cable/Alarm/WorkOrderList.vue'
 import DeviceSensorInfo from '@/components/smart-cable/Alarm/DeviceSensorInfo.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import floatBall from '@/components/smart-cable/floatingBall.vue'
 const router = useRouter();
 
 const radioRange = ref('year')
@@ -74,6 +75,8 @@ const activeTab = ref(0)
 
 <template>
   <div class="mobile-alarm-container">
+    <float-ball />
+    
     <!-- 顶部问候 -->
     <div class="greeting-header">
       <!-- <div class="greeting-text">{{ greetingMessge() }}</div> -->
