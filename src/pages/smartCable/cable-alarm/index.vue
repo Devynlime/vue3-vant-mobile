@@ -122,8 +122,8 @@ const activeTab = ref(0)
 
       <!-- 历史告警 Tab (新增) -->
       <van-tab title="历史告警">
-        <div class="tab-content">
-          <div class="section-card">
+        <div class="tab-content h-80vh">
+          <div class="section-card h-full">
             <historyAlarmDataPanel />
           </div>
         </div>

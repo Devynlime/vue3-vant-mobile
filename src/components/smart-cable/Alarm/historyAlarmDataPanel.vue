@@ -1,5 +1,5 @@
 <template>
-    <div style="overflow-x:hidden;overflow-y: auto;height: calc(100vh - 616px);padding-left: 4px;">
+    <div style="overflow-x:hidden;overflow-y: auto;height: 100%;padding-left: 4px;">
         <el-table :data="tableData" style="width: 100%;overflow:hidden;" :show-header="false" @click="handleClick">
             <el-table-column prop="name" width="120px" :title="name"/>
             <el-table-column prop="message"/>

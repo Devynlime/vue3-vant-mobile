@@ -114,18 +114,18 @@
 
 .sensor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+  gap: 12px;
 }
 
 .sensor-card {
   background: white;
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   cursor: pointer;
   transition: all 0.3s;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
@@ -137,8 +137,8 @@
 }
 
 .sensor-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,7 +147,7 @@
 }
 
 .sensor-name {
-  font-size: 14px;
+  font-size: 12px;
   color: #333;
   text-align: center;
 }
