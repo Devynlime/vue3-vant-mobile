@@ -7,13 +7,13 @@
         <DetailCard :card-title="titles[5]" :data="cableTubeData" total-unit="个" type="tube" />
 
         <el-row :gutter="4" style="margin: 0rem 0 0 0;">
-            <el-col :span="8">
+            <el-col :xs="24" :sm="24" :md="8" class="chart-col">
                 <PieChartCard pie-id="chart4" :title="titles[3]" :values="Object.values(wellData.details)" />
             </el-col>
-            <el-col :span="8">
+            <el-col :xs="24" :sm="24" :md="8" class="chart-col">
                 <PieChartCard pie-id="chart5" :title="titles[4]" :values="Object.values(cableWayData.details)" />
             </el-col>
-            <el-col :span="8">
+            <el-col :xs="24" :sm="24" :md="8" class="chart-col">
                 <PieChartCard pie-id="chart6" :title="titles[5]" :values="Object.values(cableTubeData.details)" />
             </el-col>
         </el-row>

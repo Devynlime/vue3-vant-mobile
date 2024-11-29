@@ -8,13 +8,13 @@
 
         <!-- 饼图 -->
         <el-row :gutter="4" style="margin: 0rem 0 0 0;">
-            <el-col :span="8">
+            <el-col :xs="24" :sm="24" :md="8" class="chart-col">
                 <PieChartCard pie-id="chart1" :title="titles[0]" :values="Object.values(lineData.details)" />
             </el-col>
-            <el-col :span="8">
+            <el-col :xs="24" :sm="24" :md="8" class="chart-col">
                 <PieChartCard pie-id="chart2" :title="titles[1]" :values="Object.values(segmentData.details)" />
             </el-col>
-            <el-col :span="8">
+            <el-col :xs="24" :sm="24" :md="8" class="chart-col">
                 <PieChartCard pie-id="chart3" :title="titles[2]" :values="Object.values(cableEndData.details)" />
             </el-col>
         </el-row>
