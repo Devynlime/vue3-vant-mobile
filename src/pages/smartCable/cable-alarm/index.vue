@@ -76,7 +76,7 @@ const activeTab = ref(0)
   <div class="mobile-alarm-container">
     <!-- 顶部问候 -->
     <div class="greeting-header">
-      <div class="greeting-text">{{ greetingMessge() }}</div>
+      <!-- <div class="greeting-text">{{ greetingMessge() }}</div> -->
       <div class="date-text">{{ currentDate() }}</div>
     </div>
 

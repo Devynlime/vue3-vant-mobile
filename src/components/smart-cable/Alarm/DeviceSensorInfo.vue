@@ -148,7 +148,7 @@ const gotoManholeDeviceData = (sensor,offline) =>{
     font-size: 18px;
     font-weight: bold;
     text-decoration: underline;
-    color: #fff;
+    color: var(--el-text-color-primary);
 }
 
 .icon {
@@ -217,9 +217,5 @@ const gotoManholeDeviceData = (sensor,offline) =>{
 
 :root[data-theme='dark'] .error {
     color: #F56C6C;
-}
-
-:root[data-theme='dark'] .status-bar .number {
-    color: #fff;
 }
 </style>
