@@ -12,7 +12,7 @@ const menuItems = computed(() => ([
   { title: '电缆设备概览', route: '/smartCable/dev-overview' },
   { title: '在线监测', route: '/smartCable/cable-alarm' },
   { title: '电缆井运行态势总览', route: 'smartCable' },
-  { title: '电缆井运维监控平台', route: '/smartCable/video-surveillance-todo' },
+  { title: '电缆井运维监控平台', route: '/smartCable/video-surveillance' },
   { title: '通道一张图', route: '/smartCable/channel-map' },
 ]))
 </script>

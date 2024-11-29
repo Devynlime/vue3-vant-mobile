@@ -16,7 +16,7 @@ export default defineMock([
     },
   },
   {
-    url: '/api/user/me',
+    url: '/mock/user/me',
     delay: 100,
     body: () => {
       return {
