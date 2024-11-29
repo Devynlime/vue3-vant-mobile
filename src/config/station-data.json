@@ -1,0 +1,105 @@
+{
+  "root": {
+    "name": "国网乌鲁木齐供电公司",
+    "key": "0",
+    "id": "0",
+    "image": "top-node"
+  },
+  "companies": [
+    {
+      "name": "市南供电公司",
+      "key": "1",
+      "id": "1",
+      "image": "root-node",
+      "leaf": false
+    },
+    {
+      "name": "市中供电公司",
+      "key": "2",
+      "id": "2",
+      "image": "root-node",
+      "leaf": false,
+      "channels": [
+        {
+          "name": "南湖南路电缆通道",
+          "key": "2-1",
+          "unit": "2",
+          "id": "21",
+          "image": "channel-node",
+          "leaf": false,
+          "devices": [
+            {
+              "name": "南湖南路电缆廊道J004",
+              "key": "2-1-1",
+              "unit": "2",
+              "id": "211",
+              "device_id": "T651GW202406060009000004_cam1",
+              "image": "photo",
+              "leaf": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "市北供电公司",
+      "key": "3",
+      "id": "3",
+      "image": "root-node",
+      "leaf": false,
+      "channels": [
+        {
+          "name": "卫星路电缆通道",
+          "key": "3-1",
+          "unit": "3",
+          "id": "31",
+          "image": "channel-node",
+          "leaf": false,
+          "devices": [
+            {
+              "name": "开发区变出线通道J006",
+              "key": "3-1-1",
+              "unit": "2",
+              "id": "211",
+              "device_id": "T651GW202406060009000001_cam1",
+              "channel1": "301810000003040099",
+              "channel2": "301810000003040100",
+              "image": "camera",
+              "leaf": true
+            },
+            {
+              "name": "开发区变出线通道J004",
+              "key": "3-1-2",
+              "unit": "2",
+              "id": "211",
+              "device_id": "T651GW202406060009000002_cam1",
+              "channel1": "301810000003040101",
+              "channel2": "301810000003040102",
+              "image": "camera",
+              "leaf": true
+            }
+          ]
+        },
+        {
+          "name": "长沙路电缆通道",
+          "key": "3-2",
+          "unit": "3",
+          "id": "32",
+          "image": "channel-node",
+          "leaf": false,
+          "devices": [
+            {
+              "name": "市北电缆井三宫变J005",
+              "key": "3-2-1",
+              "unit": "2",
+              "id": "211",
+              "device_id": "T651GW202406060009000003_cam1",
+              "image": "photo",
+              "leaf": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+} 
