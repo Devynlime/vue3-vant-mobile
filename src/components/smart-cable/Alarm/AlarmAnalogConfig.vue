@@ -1,27 +1,38 @@
 <template>
-    <el-dialog :title="genTitle() + '告警设置'" v-model="dialogVisible" style="height: 450px;width: 450px;" draggable="true"
-        @close="cancel">
+    <el-dialog 
+        :title="genTitle() + '告警设置'" 
+        v-model="dialogVisible"
+        :close-on-click-modal="false" 
+        :append-to-body="true"
+        class="alarm-analog-dialog"
+        :destroy-on-close="true"
+        width="400px"
+    >
         <el-form :rules="formRules" :model="formData" label-position="top" ref="analogForm">
             <el-form-item label="数据上限" prop="upperLimit">
-                <el-input v-model="uppperLimitShow" type="number" style="width: 100px;font-size:1.2rem;"></el-input>
-                <span style="font-size:1.3rem;margin-left:6px;"> {{ getUnit() }}</span> 
+                <div class="input-with-unit">
+                    <el-input v-model="uppperLimitShow" type="number" />
+                    <span class="unit-text">{{ getUnit() }}</span>
+                </div>
             </el-form-item>
 
             <el-form-item label="上限越限告警信息" prop="upperLimitAlert">
-                <el-input v-model="formData.upperLimitAlert"></el-input>
+                <el-input v-model="formData.upperLimitAlert" />
             </el-form-item>
 
             <el-form-item label="数据下限" prop="lowerLimit">
-                <el-input v-model="lowerLimitShow" type="number" style="width: 100px;font-size:1.2rem;"></el-input>
-                <span style="font-size:1.3rem;margin-left:6px;"> {{ getUnit() }}</span> 
+                <div class="input-with-unit">
+                    <el-input v-model="lowerLimitShow" type="number" />
+                    <span class="unit-text">{{ getUnit() }}</span>
+                </div>
             </el-form-item>
 
             <el-form-item label="下限越限告警信息" prop="lowerLimitAlert">
-                <el-input v-model="formData.lowerLimitAlert"></el-input>
+                <el-input v-model="formData.lowerLimitAlert" />
             </el-form-item>
         </el-form>
         <template #footer>
-            <div style="justify-content: end;display: flex;">
+            <div class="dialog-footer">
                 <el-button @click="closeDialog">取消</el-button>
                 <el-button type="primary" @click="submitForm">确定</el-button>
             </div>
@@ -186,9 +197,50 @@ watch(
 
 </script>
 
-<style scoped>
-:deep(.el-form-item__label) {
-    color: black;
-    font-weight: bolder;
+<style>
+.alarm-analog-dialog :deep(.el-dialog) {
+    margin: 15vh auto 0 !important;
+    border-radius: 8px;
+}
+
+.alarm-analog-dialog :deep(.el-dialog__header) {
+    padding: 20px 20px 10px;
+    margin-right: 0;
+    border-bottom: 1px solid #eee;
+}
+
+.alarm-analog-dialog :deep(.el-dialog__body) {
+    padding: 20px;
+}
+
+.alarm-analog-dialog :deep(.el-dialog__footer) {
+    padding: 10px 20px 20px;
+    border-top: 1px solid #eee;
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-with-unit .el-input {
+    width: 120px;
+}
+
+.unit-text {
+    font-size: 14px;
+    color: #606266;
+}
+
+.alarm-analog-dialog :deep(.el-form-item__label) {
+    padding-bottom: 8px;
+    font-weight: 500;
 }
 </style>

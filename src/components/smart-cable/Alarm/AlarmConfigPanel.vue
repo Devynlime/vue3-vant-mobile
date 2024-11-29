@@ -83,19 +83,23 @@
       </div>
     </div>
 
+    
+
     <!-- 配置弹窗 -->
-    <AlarmAnalogConfig 
-      :isVisible="isAlarmAnalogConfigVisible" 
-      @close="closeAlarmAnalogConfig" 
-      :title="sensorName"
-      :sensorType="selectedSensorType"
-    />
-    <AlarmDiscreteConfig 
-      :isVisible="isAlarmDiscreteConfigVisible" 
-      @close="closeAlarmDiscreteConfig" 
-      :title="sensorName"
-      :sensorType="selectedSensorType"
-    />
+    <div class="dialog-container">
+      <AlarmAnalogConfig 
+        :isVisible="isAlarmAnalogConfigVisible" 
+        @close="closeAlarmAnalogConfig" 
+        :title="sensorName"
+        :sensorType="selectedSensorType"
+      />
+      <AlarmDiscreteConfig 
+        :isVisible="isAlarmDiscreteConfigVisible" 
+        @close="closeAlarmDiscreteConfig" 
+        :title="sensorName"
+        :sensorType="selectedSensorType"
+      />
+    </div>
   </div>
 </template>
 
@@ -104,6 +108,8 @@
   padding: 16px;
   background: #f5f7fa;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
 .sensor-grid {
@@ -159,6 +165,23 @@
   .sensor-card {
     padding: 12px;
   }
+}
+
+.dialog-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  pointer-events: none;
+}
+
+.dialog-container > * {
+  pointer-events: auto;
 }
 </style>
 
