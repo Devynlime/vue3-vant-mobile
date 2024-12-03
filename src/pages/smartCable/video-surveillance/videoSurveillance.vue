@@ -197,6 +197,7 @@
   display: flex;
   flex-direction: column;
   min-height: 300px;
+  max-height: calc(100vh - 100px);
 }
 
 .video-tabs {
@@ -233,7 +234,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 300px;
+  height: 0;
   min-height: 300px;
   
   .video-frame {
@@ -332,7 +333,7 @@
 </style>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import { getVideoToken } from '@/api/video-api'
 import { fetchStationData } from '@/services/station-tree.service'
 
@@ -440,12 +441,29 @@ const handleVideoLoad = (index) => {
     console.log('Loading video for channel:', channel)
     videoWindow.palyVideo(channel, "电缆通道监测")
     
-    // 添加延时确保视频加载完成后自动适应大小
+    // 确保视频加载后自动适应大小
     setTimeout(() => {
       videoWindow.setVideoSize()
     }, 1000)
+
+    // 添加 ResizeObserver 监听 iframe 大小变化
+    const observer = new ResizeObserver(() => {
+      videoWindow.setVideoSize()
+    })
+    observer.observe(videoRefs.value[index])
   }
 }
+
+// 在组件卸载时清理 ResizeObserver
+onBeforeUnmount(() => {
+  videoRefs.value.forEach(ref => {
+    if (ref) {
+      const observer = new ResizeObserver(() => {})
+      observer.unobserve(ref)
+      observer.disconnect()
+    }
+  })
+})
 
 // 初始化
 onMounted(async () => {

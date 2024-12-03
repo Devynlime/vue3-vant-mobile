@@ -1,14 +1,13 @@
 {
-
   // 默认格式化工具选择prettier
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   // 保存的时候自动格式化
   "editor.formatOnSave": true,
   // 开启自动修复
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
-    "source.fixAll.eslint": "explicit",
-    "source.fixAll.stylelint": "explicit"
+    "source.fixAll": "true",
+    "source.fixAll.eslint": "true",
+    "source.fixAll.stylelint": "true"
   },
   // 配置stylelint检查的文件类型范围
   "stylelint.validate": ["css", "scss", "vue", "html"], // 与package.json的scripts对应
@@ -74,9 +73,7 @@
   // Configuration of i18n i18n-ally
   "i18n-ally.enabledParsers": ["json"],
   "i18n-ally.displayLanguage": "zh-CN",
-  "i18n-ally.localesPaths": [
-    "src/locales"
-  ],
+  "i18n-ally.localesPaths": ["src/locales"],
   "i18n-ally.keystyle": "nested",
 
   // Markdownlint rules
@@ -88,5 +85,8 @@
   "[javascript]": {
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[json]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  }
 }

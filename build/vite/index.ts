@@ -49,11 +49,7 @@ export function createVitePlugins(mode: string) {
 
     // https://github.com/antfu/unplugin-auto-import
     AutoImport({
-      include: [
-        /\.[tj]sx?$/,
-        /\.vue$/,
-        /\.vue\?vue/,
-      ],
+      include: [/\.[tj]sx?$/, /\.vue$/, /\.vue\?vue/],
       imports: [
         'vue',
         'vitest',
@@ -67,16 +63,17 @@ export function createVitePlugins(mode: string) {
         unheadVueComposablesImports,
       ],
       dts: 'src/types/auto-imports.d.ts',
-      dirs: [
-        'src/composables',
-      ],
+      dirs: ['src/composables'],
       resolvers: [VantResolver()],
     }),
 
     // https://github.com/intlify/bundle-tools/tree/main/packages/unplugin-vue-i18n
     VueI18nPlugin({
       // locale messages resource pre-compile option
-      include: resolve(dirname(fileURLToPath(import.meta.url)), '../../src/locales/**'),
+      include: resolve(
+        dirname(fileURLToPath(import.meta.url)),
+        '../../src/locales/**',
+      ),
     }),
 
     legacy({

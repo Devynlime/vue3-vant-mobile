@@ -88,7 +88,7 @@ An mobile web apps template based on the Vue 3 ecosystem.
 - [Vue Router](https://github.com/vuejs/router)
   - [`unplugin-vue-router`](https://github.com/posva/unplugin-vue-router) - file system based routing
 - [Pinia](https://pinia.vuejs.org) - Intuitive, type safe, light and flexible Store for Vue using the composition api
-  - [`pinia-plugin-persistedstate`](https://github.com/prazdevs/pinia-plugin-persistedstate) -  Configurable persistence and rehydration of Pinia stores
+  - [`pinia-plugin-persistedstate`](https://github.com/prazdevs/pinia-plugin-persistedstate) - Configurable persistence and rehydration of Pinia stores
 - [Vue I18n](https://github.com/intlify/vue-i18n-next) - Internationalization
   - [`unplugin-vue-i18n`](https://github.com/intlify/bundle-tools/tree/main/packages/unplugin-vue-i18n) - unplugin for Vue I18n
 - [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components) - components auto import
@@ -228,3 +228,15 @@ Our contributors have made this project better. Thank you! 🙏
 ## License
 
 [MIT](./LICENSE) License
+
+## 调试功能
+
+### VConsole 调试工具
+
+项目集成了移动端调试工具 VConsole，可以在设置页面中开启/关闭。
+
+- 开启方式：进入设置页面，打开 VConsole 开关
+- 使用说明：开启后可以在移动端查看控制台日志、网络请求等调试信息
+- 注意事项：
+  - 切换 VConsole 开关后页面将自动刷新以应用新设置
+  - 此功能在所有环境中都可用，请谨慎使用

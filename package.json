@@ -1,13 +1,14 @@
 {
-  "name": "vue3-vant-mobile",
+  "name": "smart-cable-wap",
   "type": "module",
-  "version": "3.1.1",
+  "version": "1.0.9",
   "packageManager": "pnpm@9.12.1",
-  "description": "Vue + Vite H5 Starter Template",
+  "description": "电缆精益化",
   "license": "MIT",
   "scripts": {
     "dev": "cross-env MOCK_SERVER_PORT=8086 vite",
     "build": "vue-tsc --noEmit && vite build",
+    "build:iguowang": "vue-tsc --noEmit && vite build --mode=iguowang",
     "build:dev": "vue-tsc --noEmit && vite build --mode=development",
     "preview": "vite preview",
     "lint": "eslint .",
