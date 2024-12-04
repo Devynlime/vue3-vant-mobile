@@ -46,6 +46,14 @@ function errorHandler(error: RequestError): Promise<any> {
 
 // 请求拦截器
 function requestHandler(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> {
+  // i国网环境下替换请求baseurl
+  if (import.meta.env.MODE === 'iguowang') {
+    // @ts-expect-error GET_PORT_URL 是外部注入的全局函数，TypeScript 无法识别
+    config.baseURL = GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL)
+    // @ts-expect-error GET_PORT_URL 是外部注入的全局函数，TypeScript 无法识别
+    console.log(GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL))
+  }
+
   const savedToken = localStorage.getItem(STORAGE_TOKEN_KEY)
   // 如果 token 存在
   // 让每个请求携带自定义 token, 请根据实际情况修改
