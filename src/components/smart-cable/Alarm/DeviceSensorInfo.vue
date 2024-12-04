@@ -98,6 +98,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const eWMStore = useEWMStore()
+const statisticJson = ref({})
 
 onMounted(() => {
     getManholeDeviceInfoStatistic().then(res => {

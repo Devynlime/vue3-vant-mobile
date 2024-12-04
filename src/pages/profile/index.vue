@@ -31,7 +31,7 @@ function login() {
     </VanCellGroup>
 
     <VanCellGroup :inset="true" class="!mt-16">
-      <van-cell :title="$t('profile.settings')" icon="setting-o" is-link to="/settings" />
+      <van-cell :title="$t('profile.settings')" icon="setting-o" is-link :to="{ name: 'settings' }" />
     </VanCellGroup>
   </div>
 </template>
