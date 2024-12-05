@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { showConfirmDialog } from 'vant'
-import router from '@/router'
 import { useUserStore } from '@/stores'
 import { useVConsoleStore } from '@/stores/modules/vconsole'
 import { version } from '~root/package.json'
@@ -11,6 +10,9 @@ const vconsoleStore = useVConsoleStore()
 const userInfo = computed(() => userStore.userInfo)
 
 const vconsoleEnabled = ref(localStorage.getItem('vConsole-enabled') === 'true')
+
+const versionClickCount = ref(0)
+const router = useRouter()
 
 function Logout() {
   showConfirmDialog({
@@ -26,6 +28,14 @@ function Logout() {
 function toggleVConsole(checked: boolean) {
   vconsoleStore.toggleVConsole(checked)
 }
+
+function handleVersionClick() {
+  versionClickCount.value++
+  if (versionClickCount.value === 5) {
+    router.push('/dev-tools')
+    versionClickCount.value = 0
+  }
+}
 </script>
 
 <template>
@@ -40,7 +50,7 @@ function toggleVConsole(checked: boolean) {
       </van-cell>
     </VanCellGroup>
 
-    <div class="mt-10 text-gray">
+    <div class="mt-10 text-gray" @click="handleVersionClick">
       {{ $t("settings.currentVersion") }}: v{{ version }}
     </div>
   </div>
