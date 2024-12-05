@@ -3,6 +3,7 @@ import axios from 'axios'
 import { showNotify } from 'vant'
 import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler'
+
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
 // 需要注意的是，请尽量保证使用中横线`-` 来作为分隔符，
@@ -52,6 +53,20 @@ function requestHandler(config: InternalAxiosRequestConfig): InternalAxiosReques
     config.baseURL = GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL)
     // @ts-expect-error GET_PORT_URL 是外部注入的全局函数，TypeScript 无法识别
     console.log(GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL))
+
+    // i国网环境下，使用SDK获取token并添加到请求头
+    // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
+    if (window.igwMethods) {
+      try {
+        // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
+        const token = window.igwMethods.getToken()
+        if (token)
+          config.headers[REQUEST_TOKEN_KEY] = `Bearer ${token}`
+      }
+      catch (error) {
+        console.error('获取i国网token失败:', error)
+      }
+    }
   }
 
   const savedToken = localStorage.getItem(STORAGE_TOKEN_KEY)
