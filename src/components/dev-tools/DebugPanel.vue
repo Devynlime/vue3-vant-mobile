@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import HttpTester from './tabs/HttpTester.vue'
 import ResourceTester from './tabs/ResourceTester.vue'
 import EnvInfo from './tabs/EnvInfo.vue'
 import LocalStorageViewer from './tabs/LocalStorageViewer.vue'
 
-const router = useRouter()
 const activeTab = ref(0)
 
 const tabs = [
@@ -21,7 +19,7 @@ const tabs = [
   <div class="debug-panel">
     <div class="debug-header">
       <h2>开发调试面板</h2>
-      <van-button size="small" type="primary" @click="router.back()">
+      <van-button size="small" type="primary" to="/profile">
         返回
       </van-button>
     </div>

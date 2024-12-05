@@ -422,6 +422,10 @@ const handleCheck = async (data, { checkedNodes: nodes }) => {
         videoUrls.value[index] = `${import.meta.env.VITE_VIDEO_SURVEILLANCE_URL}?token=${res.data.token}`
       } catch (error) {
         console.error('获取视频token失败:', error)
+        // 默认操作 - 默认读取视频html
+        videoUrls.value[index] = `${import.meta.env.VITE_VIDEO_SURVEILLANCE_URL}`
+        // 打印错误信息
+        console.warn('获取视频token失败,读取视频html', `${import.meta.env.VITE_VIDEO_SURVEILLANCE_URL}  `)
       }
     })
   )
@@ -438,7 +442,16 @@ const handleVideoLoad = (index) => {
   if (videoWindow && checkedNodes.value[index]) {
     const node = checkedNodes.value[index]
     const channel = videoTypes.value[index] === 'visiableLight' ? node.channel1 : node.channel2
-    console.log('Loading video for channel:', channel)
+    
+    // 打印完整的iframe URL
+    console.log('iframe URL:', videoUrls.value[index])
+    // 打印视频通道信息
+    console.log('Channel Info:', {
+      channelType: videoTypes.value[index],
+      channelNumber: channel,
+      nodeName: node.name
+    })
+    
     videoWindow.palyVideo(channel, "电缆通道监测")
     
     // 确保视频加载后自动适应大小
