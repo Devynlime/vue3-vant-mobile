@@ -9,6 +9,7 @@ import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler'
 // 需要注意的是，请尽量保证使用中横线`-` 来作为分隔符，
 // 避免被 nginx 等负载均衡器丢弃了自定义的请求头
 export const REQUEST_TOKEN_KEY = 'Authorization'
+export const IGW_TOKEN_KEY = 'AuthToken'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -46,29 +47,34 @@ function errorHandler(error: RequestError): Promise<any> {
 }
 
 // 请求拦截器
-function requestHandler(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> {
-  // i国网环境下替换请求baseurl
-  if (import.meta.env.MODE === 'iguowang') {
-    // @ts-expect-error GET_PORT_URL 是外部注入的全局函数，TypeScript 无法识别
-    config.baseURL = GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL)
-    // @ts-expect-error GET_PORT_URL 是外部注入的全局函数，TypeScript 无法识别
-    console.log(GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL))
+function requestHandler(
+  config: InternalAxiosRequestConfig,
+): InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig> {
+  // 根据不同环境处理请求配置
+  switch (import.meta.env.MODE) {
+    case 'iguowang':
+      // @ts-expect-error GET_PORT_URL 是外部注入的全局函数，TypeScript 无法识别
+      config.baseURL = GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL)
+      // @ts-expect-error GET_PORT_URL 是外部注入的全局函数，TypeScript 无法识别
+      console.log(GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL))
 
-    // i国网环境下，使用SDK获取token并添加到请求头
-    // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
-    if (window.igwMethods) {
-      try {
-        // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
-        const token = window.igwMethods.getToken()
-        if (token)
-          config.headers[REQUEST_TOKEN_KEY] = `Bearer ${token}`
+      // i国网环境下，使用SDK获取token并添加到请求头
+      // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
+      if (window.igwMethods) {
+        try {
+          // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
+          const token = window.igwMethods.getToken()
+          if (token)
+            config.headers[IGW_TOKEN_KEY] = `Bearer ${token}`
+        }
+        catch (error) {
+          console.error('获取i国网token失败:', error)
+        }
       }
-      catch (error) {
-        console.error('获取i国网token失败:', error)
-      }
-    }
+      break
+    default:
+      break
   }
-
   const savedToken = localStorage.getItem(STORAGE_TOKEN_KEY)
   // 如果 token 存在
   // 让每个请求携带自定义 token, 请根据实际情况修改

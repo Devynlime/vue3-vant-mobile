@@ -4,6 +4,7 @@ import HttpTester from './tabs/HttpTester.vue'
 import ResourceTester from './tabs/ResourceTester.vue'
 import EnvInfo from './tabs/EnvInfo.vue'
 import LocalStorageViewer from './tabs/LocalStorageViewer.vue'
+import VConsoleConfig from './tabs/VConsoleConfig.vue'
 
 const activeTab = ref(0)
 
@@ -12,6 +13,7 @@ const tabs = [
   { title: '资源测试', component: ResourceTester },
   { title: '环境信息', component: EnvInfo },
   { title: '存储查看', component: LocalStorageViewer },
+  { title: 'VConsole', component: VConsoleConfig },
 ]
 </script>
 

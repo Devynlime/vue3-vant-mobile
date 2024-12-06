@@ -17,6 +17,9 @@ import { onMounted, onUnmounted, nextTick } from 'vue';
 var option;
 let mapchart;
 
+// 添加基础路径配置
+const BASE_DATA_PATH = '/assets/data';
+
 const loadmap = (jsonfile) => {
     let domMap = document.querySelector(".mapcontainer")
     domMap.removeAttribute("_echarts_instance_");
@@ -25,14 +28,14 @@ const loadmap = (jsonfile) => {
     domMap.style.height = '75vh';
     
     nextTick(() => {
-        console.log(`/assets/data/${jsonfile}_full.json`)
+        console.log(`${BASE_DATA_PATH}/${jsonfile}_full.json`)
         mapchart = echarts.init(domMap);
         mapchart.showLoading();
-        fetch(`/assets/data/${jsonfile}_full.json`).then(res => {
+        fetch(`${BASE_DATA_PATH}/${jsonfile}_full.json`).then(res => {
         return res.json()
     }).then(data => {
         echarts.registerMap('mapdata', data);
-        fetch(`/assets/data/${jsonfile}_value.json`).then(res => {
+        fetch(`${BASE_DATA_PATH}/${jsonfile}_value.json`).then(res => {
             return res.json()
         }).then(val => {
             mapchart.hideLoading();

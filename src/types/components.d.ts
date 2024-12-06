@@ -106,6 +106,7 @@ declare module 'vue' {
     VanTabs: typeof import('vant/es')['Tabs']
     VanTag: typeof import('vant/es')['Tag']
     VanTreeSelect: typeof import('vant/es')['TreeSelect']
+    VConsoleConfig: typeof import('./../components/dev-tools/tabs/VConsoleConfig.vue')['default']
     VibrateIcon: typeof import('./../components/smart-cable/icon/vibrateIcon.vue')['default']
     VideoFrame: typeof import('./../components/smart-cable/videoFrame.vue')['default']
     VideoRecordIcon: typeof import('./../components/smart-cable/icon/videoRecordIcon.vue')['default']
