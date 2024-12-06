@@ -12,7 +12,8 @@
 
 <script setup>
 import * as echarts from 'echarts';
-import { onMounted, onUnmounted, nextTick } from 'vue';
+import { onMounted, onUnmounted, nextTick, ref } from 'vue';
+import { loadMapAsset } from '@/utils/asset-loader';
 
 var option;
 let mapchart;
@@ -20,77 +21,84 @@ let mapchart;
 // 添加基础路径配置
 const BASE_DATA_PATH = '/assets/data';
 
-const loadmap = (jsonfile) => {
+const loadmap = async (jsonfile) => {
     let domMap = document.querySelector(".mapcontainer")
     domMap.removeAttribute("_echarts_instance_");
 
     domMap.style.width = '100%';
     domMap.style.height = '75vh';
     
-    nextTick(() => {
-        console.log(`${BASE_DATA_PATH}/${jsonfile}_full.json`)
+    try {
+        await nextTick();
+
         mapchart = echarts.init(domMap);
         mapchart.showLoading();
-        fetch(`${BASE_DATA_PATH}/${jsonfile}_full.json`).then(res => {
-        return res.json()
-    }).then(data => {
-        echarts.registerMap('mapdata', data);
-        fetch(`${BASE_DATA_PATH}/${jsonfile}_value.json`).then(res => {
-            return res.json()
-        }).then(val => {
-            mapchart.hideLoading();
-            mapchart.setOption(
-                option = {
-                    title: {
-                        text: '乌鲁木齐',
-                        color: '#fff',
-                        left: '75%',
-                        top: '5%'
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '{b}:{c}'
-                    },
-                    visualMap: {
-                        min: 0,
-                        max: 300,
-                        text: ['High', 'Low'],
-                        realtime: false,
-                        calculable: true,
-                        show: false,
-                        inRange: {
-                            color: [
-                                '#313695',
-                                '#4575b4',
-                                '#74add1',
-                                '#abd9e9',
-                                '#e0f3f8',
-                                '#ffffbf',
-                                '#fee090',
-                                '#fdae61',
-                                '#f46d43',
-                                '#d73027',
-                                '#a50026'
-                            ]
-                        }
-                    },
-                    series: [
-                        {
-                            name: '统计信息',
-                            type: 'map',
-                            map: 'mapdata',
-                            label: {
-                                show: true
-                            },
-                            data: val,
-                            nameMap: {}
-                        }
+
+        // 使用 asset-loader 加载地图数据
+        const [mapData, valueData] = await Promise.all([
+            loadMapAsset(jsonfile, 'full'),
+            loadMapAsset(jsonfile, 'value')
+        ]);
+
+        if (!mapData || !valueData) {
+            throw new Error('地图数据加载失败');
+        }
+
+        echarts.registerMap('mapdata', mapData);
+        mapchart.hideLoading();
+        
+        mapchart.setOption({
+            title: {
+                text: '乌鲁木齐',
+                color: '#fff',
+                left: '75%',
+                top: '5%'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}:{c}'
+            },
+            visualMap: {
+                min: 0,
+                max: 300,
+                text: ['High', 'Low'],
+                realtime: false,
+                calculable: true,
+                show: false,
+                inRange: {
+                    color: [
+                        '#313695',
+                        '#4575b4',
+                        '#74add1',
+                        '#abd9e9',
+                        '#e0f3f8',
+                        '#ffffbf',
+                        '#fee090',
+                        '#fdae61',
+                        '#f46d43',
+                        '#d73027',
+                        '#a50026'
                     ]
                 }
-                )
-            })
-        })
-    })
+            },
+            series: [
+                {
+                    name: '统计信息',
+                    type: 'map',
+                    map: 'mapdata',
+                    label: {
+                        show: true
+                    },
+                    data: valueData,
+                    nameMap: {}
+                }
+            ]
+        });
+    } catch (error) {
+        console.error('加载地图数据失败:', error);
+        mapchart?.hideLoading();
+        // 这里可以添加错误提示UI
+    }
 }
 
 const handleResize = () => {
