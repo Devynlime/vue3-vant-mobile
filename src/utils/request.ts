@@ -2,7 +2,6 @@ import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
 import { IGW_USER_KEY, STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
-import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler'
 
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
@@ -98,7 +97,7 @@ function responseHandler(response: { data: any }) {
     })
     // 清除token
     localStorage.removeItem(STORAGE_TOKEN_KEY)
-    mockLogin()
+    // mockLogin()
     return Promise.reject(new Error('登录已过期'))
   }
   return response.data
