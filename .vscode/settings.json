@@ -5,9 +5,9 @@
   "editor.formatOnSave": true,
   // 开启自动修复
   "editor.codeActionsOnSave": {
-    "source.fixAll": true,
-    "source.fixAll.eslint": true,
-    "source.fixAll.stylelint": true
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
   },
   // 配置stylelint检查的文件类型范围
   "stylelint.validate": ["css", "scss", "vue", "html"], // 与package.json的scripts对应

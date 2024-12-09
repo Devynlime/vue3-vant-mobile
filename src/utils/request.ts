@@ -1,7 +1,7 @@
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
-import { STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
+import { IGW_USER_KEY, STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler'
 
 // 这里是用于设定请求后端时，所用的 Token KEY
@@ -59,17 +59,19 @@ function requestHandler(
       console.log(GET_PORT_URL(import.meta.env.VITE_APP_API_BASE_URL))
 
       // i国网环境下，使用SDK获取token并添加到请求头
-      // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
-      if (window.igwMethods) {
-        try {
-          // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
-          const token = window.igwMethods.getToken()
-          if (token)
-            config.headers[IGW_TOKEN_KEY] = `Bearer ${token}`
+      try {
+        // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
+        console.log('igwMethods.getToken()', igwMethods.getToken())
+        const igwUser = localStorage.getItem(IGW_USER_KEY)
+        if (igwUser) {
+          const igwToken = JSON.parse(igwUser).user.token
+          console.log('igwToken', igwToken)
+          if (igwToken)
+            config.headers[IGW_TOKEN_KEY] = `Bearer ${igwToken}`
         }
-        catch (error) {
-          console.error('获取i国网token失败:', error)
-        }
+      }
+      catch (error) {
+        console.error('获取i国网token失败:', error)
       }
       break
     default:
