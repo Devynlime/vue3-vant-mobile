@@ -230,7 +230,6 @@
 }
 
 .video-content {
-  flex: 1;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -239,11 +238,11 @@
   
   .video-frame {
     width: 100%;
-    height: 100%;
-    flex: 1;
+    height: calc(100% - 60px); // 减去底部控制栏的高度
     border: none;
     background: #000;
     display: block;
+    object-fit: contain;
   }
 }
 
