@@ -32,6 +32,7 @@ declare module 'vue-router/auto-routes' {
     'settings': RouteRecordInfo<'settings', '/settings', Record<never, never>, Record<never, never>>,
     'smartCable': RouteRecordInfo<'smartCable', '/smartCable', Record<never, never>, Record<never, never>>,
     'cableAlarm': RouteRecordInfo<'cableAlarm', '/smartCable/cable-alarm', Record<never, never>, Record<never, never>>,
+    '/smartCable/channel-detect/': RouteRecordInfo<'/smartCable/channel-detect/', '/smartCable/channel-detect', Record<never, never>, Record<never, never>>,
     'devOverview': RouteRecordInfo<'devOverview', '/smartCable/dev-overview', Record<never, never>, Record<never, never>>,
     'deviceOverview': RouteRecordInfo<'deviceOverview', '/smartCable/dev-overview/deviceOverview', Record<never, never>, Record<never, never>>,
     'videoSurveillance': RouteRecordInfo<'videoSurveillance', '/smartCable/video-surveillance', Record<never, never>, Record<never, never>>,

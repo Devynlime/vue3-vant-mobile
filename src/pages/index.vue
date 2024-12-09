@@ -40,7 +40,7 @@ const menuItems = [
   },
   {
     title: '通道一张图',
-    route: '/smartCable/channel-map',
+    route: '/smartCable/channel-detect',
     icon: Map,
   },
 ]
