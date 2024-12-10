@@ -70,7 +70,7 @@ const defaultProps = {
   isLeaf: 'leaf'
 }
 
-const mapHeight = computed(() => isTreeVisible.value ? '50vh' : '100vh')
+const mapHeight = computed(() => '100vh')
 
 const toggleTree = () => {
   isTreeVisible.value = !isTreeVisible.value
@@ -159,26 +159,41 @@ onMounted(() => {
 
 <style scoped>
 .channel-detect-container {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   height: 100vh;
   overflow: hidden;
 }
 
 .search-bar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 10;
   display: flex;
   padding: 10px;
-  background-color: #f0f0f0;
+  background-color: #f0f0f027;
+  border-radius: 4px;
 }
 
 .tree-container {
-  flex-shrink: 0;
+  position: absolute;
+  top: 60px;
+  left: 15px;
+  right: 15px;
+  z-index: 10;
   background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .map-container {
-  flex-grow: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
 }
 
 .slide-fade-enter-active,
@@ -195,5 +210,6 @@ onMounted(() => {
 .custom-tree-node {
   display: flex;
   align-items: center;
+  border-radius: 20px;
 }
 </style>
