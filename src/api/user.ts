@@ -2,6 +2,7 @@ import request from '@/utils/request'
 
 export interface LoginData {
   email: string
+  username: string
   password: string
 }
 
@@ -13,6 +14,7 @@ export interface UserState {
   uid?: number
   name?: string
   avatar?: string
+  token?: string
 }
 
 export function login(data: LoginData): Promise<any> {
@@ -37,4 +39,16 @@ export function resetPassword(): Promise<any> {
 
 export function register(): Promise<any> {
   return request.post('/user/register')
+}
+
+// 获取验证码
+export function getCodeImg() {
+  return request({
+    url: '/code',
+    headers: {
+      isToken: false,
+    },
+    method: 'get',
+    timeout: 20000,
+  })
 }

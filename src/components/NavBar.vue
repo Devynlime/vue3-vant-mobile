@@ -27,8 +27,8 @@ const showLeftArrow = computed(() => routeWhiteList.includes(route.name))
   <VanNavBar
     :title="title"
     :fixed="true"
-    clickable
-    placeholder
+
+    placeholder clickable
     :left-arrow="!showLeftArrow"
     @click-left="onBack"
   />

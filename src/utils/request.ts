@@ -59,8 +59,7 @@ function requestHandler(
 
       // i国网环境下，使用SDK获取token并添加到请求头
       try {
-        // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
-        console.log('igwMethods.getToken()', igwMethods.getToken())
+        // console.log('igwMethods.getToken()', igwMethods.getToken()) // 通过该方法获取token会报错
         const igwUser = localStorage.getItem(IGW_USER_KEY)
         if (igwUser) {
           const igwToken = JSON.parse(igwUser).user.token

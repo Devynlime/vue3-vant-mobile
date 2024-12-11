@@ -30,7 +30,8 @@ router.beforeEach(async (to: EnhancedRouteLocation, _from, next) => {
   // Route cache
   routeCacheStore.addRoute(to)
 
-  if (isLogin() && !userStore.userInfo?.uid)
+  // 如果用户已登录且没有用户信息，则获取用户信息
+  if (isLogin() && !userStore.userInfo?.name)
     await userStore.info()
 
   next()

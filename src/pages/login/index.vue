@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type RouteMap, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores'
+import { getCodeImg } from '@/api/user'
 
 import logo from '~/images/logo.svg'
 import logoDark from '~/images/logo-dark.svg'
@@ -20,24 +21,50 @@ watch(
   },
 )
 
+const captchaEnabled = ref(true)
+const codeUrl = ref('')
+
 const postData = reactive({
-  email: '',
+  username: '',
   password: '',
+  code: '',
+  uuid: '',
 })
 
 const rules = reactive({
-  email: [
-    { required: true, message: t('login.pleaseEnterEmail') },
+  username: [
+    { required: true, message: t('login.pleaseEnterUsername') },
   ],
   password: [
     { required: true, message: t('login.pleaseEnterPassword') },
   ],
+  code: [
+    { required: true, message: t('login.pleaseEnterCaptcha') },
+  ],
 })
+
+// 获取验证码
+function getCode() {
+  getCodeImg().then((res) => {
+    // @ts-expect-error - API response type is not properly defined
+    captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled
+    if (captchaEnabled.value) {
+      // @ts-expect-error - Base64 image response type is not properly defined
+      codeUrl.value = `data:image/gif;base64,${res.img}`
+      // @ts-expect-error - UUID response type is not properly defined
+      postData.uuid = res.uuid
+    }
+  })
+}
+
+// 初始化时获取验证码
+getCode()
 
 async function login(values: any) {
   try {
     loading.value = true
     await userStore.login({ ...postData, ...values })
+    console.log(userStore.userInfo)
     const { redirect, ...othersQuery } = router.currentRoute.value.query
     router.push({
       name: (redirect as keyof RouteMap) || 'home',
@@ -61,9 +88,9 @@ async function login(values: any) {
     <van-form :model="postData" :rules="rules" validate-trigger="onSubmit" @submit="login">
       <div class="overflow-hidden rounded-3xl">
         <van-field
-          v-model="postData.email"
-          :rules="rules.email"
-          name="email"
+          v-model="postData.username"
+          :rules="rules.username"
+          name="username"
           :placeholder="t('login.email')"
         />
       </div>
@@ -76,6 +103,26 @@ async function login(values: any) {
           name="password"
           :placeholder="t('login.password')"
         />
+      </div>
+
+      <div v-if="captchaEnabled" class="mt-16 overflow-hidden rounded-3xl">
+        <van-field
+          v-model="postData.code"
+          :rules="rules.code"
+          name="code"
+          :placeholder="t('login.captcha')"
+        >
+          <template #right-icon>
+            <div class="h-full flex items-center px-12">
+              <img
+                :src="codeUrl"
+                alt="captcha"
+                class="h-32 cursor-pointer border-l border-gray-100 pl-12"
+                @click="getCode"
+              >
+            </div>
+          </template>
+        </van-field>
       </div>
 
       <div class="mt-16">
@@ -108,3 +155,12 @@ async function login(values: any) {
   }
 }
 </route>
+
+<style scoped>
+.van-field :deep(.van-field__right-icon) {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+}
+</style>

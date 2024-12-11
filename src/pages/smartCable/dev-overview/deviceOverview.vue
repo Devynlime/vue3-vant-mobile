@@ -4,7 +4,7 @@ import EchartMap from '@/components/smart-cable/dev-overview/EchartMap.vue'
 import { transformerSubstationIcon } from '@/components/icon'
 import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import { cableStatistic, channelStatistic, feederLineStatistic, substationStatistic } from '@/api/device-overview'
-import { mockLogin } from '@/components/smart-cable/cable-v2/tokenHandler'
+import { mockLogin } from '@/utils/cable-v2/tokenHandler'
 
 const props = defineProps({
   display: String,

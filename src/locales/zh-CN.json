@@ -50,7 +50,9 @@
     "pleaseEnterEmail": "请输入邮箱",
     "pleaseEnterPassword": "请输入密码",
     "sign-up": "还没有账号？点击注册",
-    "forgot-password": "忘记密码？"
+    "forgot-password": "忘记密码？",
+    "captcha": "验证码",
+    "clickToRefresh": "点击刷新"
   },
   "forgot-password": {
     "email": "邮箱",

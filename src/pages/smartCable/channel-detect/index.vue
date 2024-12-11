@@ -26,7 +26,14 @@
             :data="treeData"
             :props="defaultProps"
             :filter-node-method="filterNode"
-            @node-click="handleNodeClick"
+            @check="handleCheckChange"
+            node-key="id"
+            :highlight-current="true"
+            :default-expanded-keys="defaultExpandedKeys"
+            lazy
+            :load="loadNode"
+            show-checkbox
+            check-strictly
           >
             <template #default="{ node, data }">
               <span class="custom-tree-node">
@@ -36,7 +43,9 @@
                   :src="getImageUrl(data.image)"
                   fit="fill"
                 />
-                <span>{{ node.label }}</span>
+                <span :class="{ 'selected-node': data.checked }">
+                  {{ node.label }}
+                </span>
               </span>
             </template>
           </el-tree>
@@ -55,19 +64,22 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { Search, ArrowUp, ArrowDown } from '@element-plus/icons-vue'
 import BaiduChannelMap from '@/components/smart-cable/channel-detect/BaiduChannelMap.vue'
 import { ElMessage } from 'element-plus'
-import { searchChannelList, searchManagementChannelList } from "@/api/management-channel"
+import { searchChannelList, searchManagementChannelList, getChannelManholeAndChildChannel } from "@/api/management-channel"
 
 const channelTree = ref(null)
 const channelMap = ref(null)
 const filterText = ref('')
-const isTreeVisible = ref(false)
+const isTreeVisible = ref(true)
 const treeData = ref([])
+const selectedChannels = ref(new Set())
+const defaultExpandedKeys = ref(['0'])
 const baiduMapApiKey = '7lZj0aj7OC987xjDhABFpHfVyie15F2l' // 替换为您的百度地图 API 密钥
 
 const defaultProps = {
   children: 'children',
   label: 'name',
-  isLeaf: 'leaf'
+  isLeaf: 'leaf',
+  disabled: false
 }
 
 const mapHeight = computed(() => '100vh')
@@ -82,29 +94,63 @@ const handleClear = () => {
 
 const filterNode = (value, data) => {
   if (!value) return true
-  return data.name.includes(value)
+  return data.name.toLowerCase().includes(value.toLowerCase())
 }
 
-const handleNodeClick = (data) => {
-  if (data.leaf) {
-    channelMap.value.flytoPosition([data.longitude, data.latitude])
+const handleCheckChange = async (data, checked) => {
+  if (!data.leaf) return
+  
+  try {
+    // 获取通道详细信息
+    const res = await getChannelManholeAndChildChannel({
+      channelCode: data.channelCode,
+      managementChannelId: data.key,
+      operationUnit: data.unit
+    })
+    
+    if (!checked) {
+      channelMap.value.removeSegmentFromMap(data.id)
+    } else {
+      channelMap.value.addSegmentInMap(res, data.id)
+      // 定位到通道位置
+      if (res.data?.coordinates) {
+        channelMap.value.flytoPosition(res.data.coordinates)
+      }
+    }
+  } catch (error) {
+    ElMessage.error('加载通道信息失败')
   }
 }
 
 const loadNode = async (node, resolve) => {
   if (node.level === 0) {
-    resolve([{ name: '国网乌鲁木齐供电公司', key: '0', id: '0', image: 'top-node' }])
+    const rootNode = { name: '国网乌鲁木齐供电公司', key: '0', id: '0', image: 'top-node', disabled: true }
+    resolve([rootNode])
+    setTimeout(() => {
+      const firstNode = channelTree.value.getNode(rootNode)
+      if (firstNode) {
+        firstNode.expanded = true
+      }
+    }, 100)
   } else if (node.level === 1) {
     const companies = [
-      { name: '市南供电公司', key: '1', id: '1', image: 'root-node' },
-      { name: '市中供电公司', key: '2', id: '2', image: 'root-node' },
-      { name: '市北供电公司', key: '3', id: '3', image: 'root-node' },
-      { name: '乌鲁木齐县供电公司', key: '4', id: '4', image: 'root-node' },
-      { name: '五家渠供电公司', key: '5', id: '5', image: 'root-node' },
-      { name: '米东供电公司', key: '6', id: '6', image: 'root-node' },
-      { name: '西郊供电公司', key: '7', id: '7', image: 'root-node' },
+      { name: '市南供电公司', key: '1', id: '1', image: 'root-node', disabled: true },
+      { name: '市中供电公司', key: '2', id: '2', image: 'root-node', disabled: true },
+      { name: '市北供电公司', key: '3', id: '3', image: 'root-node', disabled: true },
+      { name: '乌鲁木齐县供电公司', key: '4', id: '4', image: 'root-node', disabled: true },
+      { name: '五家渠供电公司', key: '5', id: '5', image: 'root-node', disabled: true },
+      { name: '米东供电公司', key: '6', id: '6', image: 'root-node', disabled: true },
+      { name: '西郊供电公司', key: '7', id: '7', image: 'root-node', disabled: true },
     ]
     resolve(companies)
+    setTimeout(() => {
+      companies.forEach(company => {
+        const companyNode = channelTree.value.getNode(company)
+        if (companyNode) {
+          companyNode.expanded = true
+        }
+      })
+    }, 100)
   } else if (node.level === 2) {
     try {
       const res = await searchManagementChannelList({ operationUnit: node.data.key })
@@ -115,6 +161,7 @@ const loadNode = async (node, resolve) => {
         id: node.data.key + item.channelId,
         image: 'channel-node',
         leaf: false,
+        disabled: false
       }))
       resolve(channels)
     } catch (error) {
@@ -124,23 +171,23 @@ const loadNode = async (node, resolve) => {
   } else if (node.level === 3) {
     try {
       const res = await searchChannelList(node.data.key, node.data.unit)
-      const subChannels = res.data
+      const channels = res.data
         .filter(item => item.count > 0)
         .map(item => ({
           name: item.channelName,
           key: node.data.key,
           unit: node.data.unit,
-          id: node.data.unit + node.data.key,
+          id: `${node.data.unit}-${node.data.key}-${item.channelCode}`,
           image: item.channelCode,
+          channelCode: item.channelCode,
           leaf: true,
+          disabled: false
         }))
-      resolve(subChannels)
+      resolve(channels)
     } catch (error) {
       ElMessage.error('加载子通道失败')
       resolve([])
     }
-  } else {
-    resolve([])
   }
 }
 
@@ -153,7 +200,13 @@ watch(filterText, (val) => {
 })
 
 onMounted(() => {
-  treeData.value = [{ name: '国网乌鲁木齐供电公司', key: '0', id: '0', image: 'top-node' }]
+  // 初始化根节点数据
+  treeData.value = [{ 
+    name: '国网乌鲁木齐供电公司',
+    key: '0',
+    id: '0',
+    image: 'top-node'
+  }]
 })
 </script>
 
@@ -185,6 +238,8 @@ onMounted(() => {
   background-color: #ffffff;
   border-radius: 20px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 .map-container {
@@ -210,6 +265,33 @@ onMounted(() => {
 .custom-tree-node {
   display: flex;
   align-items: center;
-  border-radius: 20px;
+  padding: 4px 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.selected-node {
+  color: #138D75;
+  font-weight: bold;
+}
+
+:deep(.el-tree-node__content) {
+  height: 32px;
+}
+
+:deep(.el-checkbox__inner) {
+  border-radius: 2px;
+}
+
+/* 新增移动端适配样式 */
+@media screen and (max-width: 768px) {
+  .tree-container {
+    width: 90%;
+    max-height: 60vh;
+  }
+  
+  .search-bar {
+    padding: 8px;
+  }
 }
 </style>

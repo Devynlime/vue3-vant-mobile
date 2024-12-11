@@ -27,6 +27,7 @@
     "axios": "^1.7.7",
     "echarts": "^5.5.1",
     "element-plus": "^2.8.8",
+    "js-cookie": "^3.0.5",
     "lodash-es": "^4.17.21",
     "lucide-vue-next": "^0.465.0",
     "nprogress": "^0.2.0",

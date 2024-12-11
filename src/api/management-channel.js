@@ -1,4 +1,4 @@
-import request from '@/utils/request-prod'
+import request from '@/utils/request'
 
 // 根据managementChannelId获取
 export function searchChannelList(managementChannelId, operationUnit) {
