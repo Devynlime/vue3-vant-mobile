@@ -33,7 +33,7 @@ function handleVersionClick() {
 <template>
   <div class="text-center">
     <VanCellGroup :inset="true">
-      <van-cell v-if="userInfo.uid" :title="$t('settings.logout')" clickable class="van-text-color" @click="Logout" />
+      <van-cell v-if="userInfo.name" :title="$t('settings.logout')" clickable class="van-text-color" @click="Logout" />
     </VanCellGroup>
 
     <div class="mt-10 text-gray" @click="handleVersionClick">
