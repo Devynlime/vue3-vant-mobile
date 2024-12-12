@@ -125,7 +125,7 @@
     
     script.onerror = () => {
       console.error('百度地图脚本加载失败')
-      ElMessage.error('百度地图脚本加载失败，请检查网络���接')
+      ElMessage.error('百度地图脚本加载失败，请检查网络连接')
     }
     
     document.body.appendChild(script)
@@ -134,8 +134,16 @@
   
   onUnmounted(() => {
     if (baiduMap) {
-      baiduMap.destroy()
+      // 清除所有覆盖物
+      baiduMap.clearOverlays()
+      // 将地图容器内容清空
+      if (mapContainer.value) {
+        mapContainer.value.innerHTML = ''
+      }
+      // 将地图实例设置为 null
+      baiduMap = null
     }
+    // 清除全局回调函数
     delete window.initBaiduMap
   })
   

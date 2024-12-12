@@ -18,6 +18,33 @@ export function login(username, password, code, uuid) {
     data,
   });
 }
+
+/**
+ * 电缆井获取token
+ * @description 通过用户信息和票据获取访问令牌
+ * @param {string} userName - 用户名
+ * @param {string} userId - 用户ID
+ * @param {string} ticket - 票据
+ * @param {string} sm4key - SM4加密密钥
+ * @returns {Promise} 返回包含token的Promise对象
+ */
+export const getToken = (userName, userId, ticket, sm4key) => {
+  const data = {
+    userName,
+    userId,
+    ticket,
+    sm4key,
+  };
+  return request({
+    url: "/auth/igw-login",
+    headers: {
+      isToken: false,
+    },
+    method: "post",
+    data: data,
+  });
+};
+
 const username = "admin";
 const password = "Cable@2024";
 

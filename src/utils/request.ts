@@ -2,6 +2,7 @@ import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import axios from 'axios'
 import { showNotify } from 'vant'
 import { IGW_USER_KEY, STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
+import { getToken } from '@/utils/cable-v2/tokenHandler'
 
 // 这里是用于设定请求后端时，所用的 Token KEY
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
@@ -88,17 +89,60 @@ function requestHandler(
 request.interceptors.request.use(requestHandler, errorHandler)
 
 // 响应拦截器
-function responseHandler(response: { data: any }) {
+/**
+ * 响应拦截器处理函数
+ * @param response - 响应对象
+ * @returns 处理后的响应数据
+ */
+async function responseHandler(response: { data: any }) {
+  // 处理401未授权的情况
   if (response.data.code === 401) {
+    // 显示登录过期提示
     showNotify({
       type: 'danger',
       message: '登录已过期,请重新登录',
     })
-    // 清除token
+
+    // 清除本地存储的token
     localStorage.removeItem(STORAGE_TOKEN_KEY)
-    // mockLogin()
+
+    // 尝试重新获取电缆井token
+    const userId = localStorage.getItem('userId') || ''
+    const sm4key = localStorage.getItem('sm4key') || ''
+    const wxcode = localStorage.getItem('wxcode') || ''
+    const tokenParams = { userName: 'default', userId, ticket: wxcode, sm4key }
+    try {
+      // 从本地存储获取i国网用户信息
+      const username = JSON.parse(localStorage.getItem(IGW_USER_KEY)).user.userName
+      tokenParams.userName = username
+
+      // 调用微信SDK获取授权码
+      // @ts-expect-error 这里需要使用微信的js-sdk
+      const ticket = wx.invoke('getAuthCode', {
+        responseType: 'code', // 固定参数
+        scope: 'snsapi_base', // 固定参数
+      }, (res) => {
+        console.log('js获取code:', res)
+      })
+
+      // 使用获取的信息重新请求token
+      tokenParams.ticket = ticket
+    }
+    catch (error) {
+      console.error('重新获取电缆井token失败:', error)
+    }
+    // 如果成功获取新token则更新到本地存储
+    const result = await getToken(tokenParams.userName, tokenParams.userId, tokenParams.ticket, tokenParams.sm4key)
+    if (result?.data?.access_token) {
+      localStorage.setItem(STORAGE_TOKEN_KEY, result.data.access_token)
+      // 刷新页面
+      window.location.reload()
+    }
+
     return Promise.reject(new Error('登录已过期'))
   }
+
+  // 返回响应数据
   return response.data
 }
 
