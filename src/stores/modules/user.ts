@@ -68,8 +68,10 @@ export const useUserStore = defineStore(
      */
     const info = async () => {
       try {
-        const { data } = await getUserInfo()
-        setInfo(data)
+        const { userInfo, token } = await getUserInfo()
+        console.log('user', userInfo)
+        const igwUserInfo = { name: userInfo.iscAccount, token }
+        setInfo(igwUserInfo)
       }
       catch (error) {
         clearToken()

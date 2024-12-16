@@ -1,5 +1,7 @@
 import request from '@/utils/request'
 
+import { IGW_USER_KEY } from '@/stores/mutation-type'
+
 export interface LoginData {
   email: string
   username: string
@@ -26,7 +28,9 @@ export function logout() {
 }
 
 export function getUserInfo() {
-  return request<UserState>('/user/me')
+  const userStorage = localStorage.getItem(IGW_USER_KEY)
+  // console.log('userStorage', userStorage)
+  return Promise.resolve(JSON.parse(userStorage).user)
 }
 
 export function getEmailCode(): Promise<any> {

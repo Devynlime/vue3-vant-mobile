@@ -6,6 +6,7 @@ import { getCodeImg } from '@/api/user'
 import logo from '~/images/logo.svg'
 import logoDark from '~/images/logo-dark.svg'
 import vw from '@/utils/inline-px-to-vw'
+import { refreshCableToken } from '@/utils/cable-v2/tokenHandler'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -21,7 +22,7 @@ watch(
   },
 )
 
-const captchaEnabled = ref(true)
+const captchaEnabled = ref(false)
 const codeUrl = ref('')
 
 const postData = reactive({
@@ -29,6 +30,16 @@ const postData = reactive({
   password: '',
   code: '',
   uuid: '',
+})
+
+// 加载时自动填入用户信息
+onMounted(async () => {
+  await userStore.info()
+
+  if (userStore.userInfo.name) {
+    postData.username = userStore.userInfo.name
+    postData.password = userStore.userInfo.token
+  }
 })
 
 const rules = reactive({
@@ -45,6 +56,9 @@ const rules = reactive({
 
 // 获取验证码
 function getCode() {
+  if (!captchaEnabled.value) {
+    return
+  }
   getCodeImg().then((res) => {
     // @ts-expect-error - API response type is not properly defined
     captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled
@@ -60,10 +74,12 @@ function getCode() {
 // 初始化时获取验证码
 getCode()
 
-async function login(values: any) {
+async function login() {
   try {
     loading.value = true
-    await userStore.login({ ...postData, ...values })
+    // await userStore.login({ ...postData, ...values })
+    // 走igw 的token请求接口
+    await refreshCableToken()
     console.log(userStore.userInfo)
     const { redirect, ...othersQuery } = router.currentRoute.value.query
     router.push({

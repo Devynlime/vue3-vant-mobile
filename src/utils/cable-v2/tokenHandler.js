@@ -1,5 +1,6 @@
 import request from "@/utils/request";
 import { GDE_TOKEN_KEY } from "@/stores/mutation-type";
+import { STORAGE_TOKEN_KEY } from "@/stores/mutation-type";
 
 // 登录方法
 export function login(username, password, code, uuid) {
@@ -59,3 +60,48 @@ export const mockLogin = () => {
       reject(error);
     });
 };
+
+// refreshCableToken
+export async function refreshCableToken() {
+  const userId = localStorage.getItem("userId") || "";
+  const sm4key = localStorage.getItem("sm4key") || "";
+  const wxcode = localStorage.getItem("wxcode") || "";
+  const tokenParams = { userName: "default", userId, ticket: wxcode, sm4key };
+
+  try {
+    // 从本地存储获取i国网用户信息
+    const username = JSON.parse(localStorage.getItem(IGW_USER_KEY)).user
+      .userName;
+    tokenParams.userName = username;
+
+    // 调用微信SDK获取授权码
+    // @ts-expect-error 这里需要使用微信的js-sdk
+    const ticket = wx.invoke(
+      "getAuthCode",
+      {
+        responseType: "code", // 固定参数
+        scope: "snsapi_base", // 固定参数
+      },
+      (res) => {
+        console.log("js获取code:", res);
+      }
+    );
+
+    tokenParams.ticket = ticket;
+  } catch (error) {
+    console.error("重新获取电缆井token失败:", error);
+  }
+
+  // 如果成功获取新token则更新到本地存储
+  const result = await getToken(
+    tokenParams.userName,
+    tokenParams.userId,
+    tokenParams.ticket,
+    tokenParams.sm4key
+  );
+  if (result?.data?.access_token) {
+    localStorage.setItem(STORAGE_TOKEN_KEY, result.data.access_token);
+    return true;
+  }
+  return false;
+}

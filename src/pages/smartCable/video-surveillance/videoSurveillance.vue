@@ -27,7 +27,7 @@
             <span class="custom-tree-node">
               <el-image 
                 style="width: 16px; height: 16px" 
-                :src="`assets/images/${data.image}.png`" 
+                :src="`/assets/images/${data.image}.png`" 
               />
               <span class="node-label">{{ data.name }}</span>
             </span>
