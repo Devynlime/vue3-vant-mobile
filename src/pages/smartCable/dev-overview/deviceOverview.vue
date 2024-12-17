@@ -15,9 +15,7 @@ const feederLineStatisticData = ref(null)
 const cableStatisticData = ref(null)
 const channelStatisticData = ref(null)
 onMounted(async () => {
-  try {
-    await mockLogin()
-    
+  try {    
     const [substationData, feederData, cableData, channelData] = await Promise.all([
       substationStatistic(),
       feederLineStatistic(),

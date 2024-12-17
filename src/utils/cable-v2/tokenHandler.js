@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 import { GDE_TOKEN_KEY } from "@/stores/mutation-type";
-import { STORAGE_TOKEN_KEY } from "@/stores/mutation-type";
+import { STORAGE_TOKEN_KEY, IGW_USER_KEY } from "@/stores/mutation-type";
 
 // 登录方法
 export function login(username, password, code, uuid) {

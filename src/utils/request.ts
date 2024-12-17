@@ -61,19 +61,20 @@ function requestHandler(
     const igwUser = localStorage.getItem(IGW_USER_KEY)
     if (igwUser) {
       const igwToken = JSON.parse(igwUser).user.token
-      console.log('igwToken', igwToken)
+      // console.log('igwToken', igwToken)
       if (igwToken)
-        config.headers[IGW_TOKEN_KEY] = igwToken
+        config.headers[REQUEST_TOKEN_KEY] = igwToken
     }
   }
   catch (error) {
     console.error('获取i国网token失败:', error)
   }
-  const savedToken = localStorage.getItem(STORAGE_TOKEN_KEY)
+
+  const cableToken = localStorage.getItem(STORAGE_TOKEN_KEY)
   // 如果 token 存在
   // 让每个请求携带自定义 token, 请根据实际情况修改
-  if (savedToken)
-    config.headers[REQUEST_TOKEN_KEY] = `Bearer ${savedToken}`
+  if (cableToken)
+    config.headers[IGW_TOKEN_KEY] = `Bearer ${cableToken}`
 
   return config
 }
