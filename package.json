@@ -1,7 +1,7 @@
 {
   "name": "smart-cable-wap",
   "type": "module",
-  "version": "1.0.20",
+  "version": "1.0.22",
   "packageManager": "pnpm@9.12.1",
   "description": "电缆精益化",
   "license": "MIT",

@@ -63,7 +63,7 @@ function requestHandler(
       const igwToken = JSON.parse(igwUser).user.token
       // console.log('igwToken', igwToken)
       if (igwToken)
-        config.headers[REQUEST_TOKEN_KEY] = igwToken
+        config.headers[IGW_TOKEN_KEY] = igwToken
     }
   }
   catch (error) {
@@ -74,7 +74,7 @@ function requestHandler(
   // 如果 token 存在
   // 让每个请求携带自定义 token, 请根据实际情况修改
   if (cableToken)
-    config.headers[IGW_TOKEN_KEY] = `Bearer ${cableToken}`
+    config.headers[REQUEST_TOKEN_KEY] = `Bearer ${cableToken}`
 
   return config
 }
