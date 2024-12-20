@@ -7,8 +7,8 @@ import { IGW_USER_KEY, STORAGE_TOKEN_KEY } from '@/stores/mutation-type'
 // 可以根据自己的需要修改，常见的如 Access-Token，Authorization
 // 需要注意的是，请尽量保证使用中横线`-` 来作为分隔符，
 // 避免被 nginx 等负载均衡器丢弃了自定义的请求头
-export const REQUEST_TOKEN_KEY = 'CableToken'
-export const IGW_TOKEN_KEY = 'AuthToken'
+export const REQUEST_TOKEN_KEY = 'AuthToken'
+export const IGW_TOKEN_KEY = 'Authorization'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -62,12 +62,21 @@ function requestHandler(
     if (igwUser) {
       const igwToken = JSON.parse(igwUser).user.token
       // console.log('igwToken', igwToken)
-      if (igwToken)
-        config.headers[IGW_TOKEN_KEY] = igwToken
+      config.headers[IGW_TOKEN_KEY] = igwToken
     }
   }
   catch (error) {
     console.error('获取i国网token失败:', error)
+  }
+
+  // 测试igwMethods.getToken
+  try {
+    // @ts-expect-error igwMethods 是外部注入的全局函数，TypeScript 无法识别
+    const token = igwMethods.getToken()
+    console.log('igwMethods.getToken() 成功:', token)
+  }
+  catch (error) {
+    console.error('igwMethods.getToken() 失败:', error)
   }
 
   const cableToken = localStorage.getItem(STORAGE_TOKEN_KEY)
