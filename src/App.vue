@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import useAppStore from '@/stores/modules/app'
 import useRouteCache from '@/stores/modules/routeCache'
 import useAutoThemeSwitcher from '@/hooks/useAutoThemeSwitcher'
+import { refreshCableToken } from '@/utils/cable-v2/tokenHandler'
 
 useHead({
   title: 'Vue3 Vant Mobile',
@@ -36,6 +37,8 @@ const keepAliveRouteNames = computed(() => {
 
 onMounted(() => {
   initializeThemeSwitcher()
+  // 获取token
+  refreshCableToken()
 })
 </script>
 
