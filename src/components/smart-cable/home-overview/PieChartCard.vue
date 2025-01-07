@@ -31,29 +31,37 @@ const handleResize = () => {
     }
 }
 
-const data = reactive({
+// 修改 data 的定义方式，改用 ref 来确保响应性
+const data = ref({
     running: 0,
     fault: 0,
     maintenance: 0,
     construction: 0,
     outage: 0,
     other: 0
-})
+});
 
+// 修改 watch 处理方式
 watch(() => props.values, (newVal) => {
     if (!newVal) return;
     
-    data.running = newVal[0];
-    data.fault = newVal[1];
-    data.maintenance = newVal[2];
-    data.construction = newVal[3];
-    data.outage = newVal[4];
-    data.other = newVal[5];
+    data.value = {
+        running: newVal[0],
+        fault: newVal[1],
+        maintenance: newVal[2],
+        construction: newVal[3],
+        outage: newVal[4],
+        other: newVal[5]
+    };
+    
+    // 确保图表更新
+    nextTick(() => {
+        updateChart();
+    });
+}, { deep: true, immediate: true });
 
-    updateChart();
-}, { deep: true })
-
-const option = reactive({
+// 修改 option 中的数据绑定方式
+const option = computed(() => ({
     tooltip: {
         trigger: 'item'
     },
@@ -78,16 +86,16 @@ const option = reactive({
                 }
             },
             data: [
-                { value: computed(()=>data.running), name: '运行' },
-                { value: computed(()=>data.fault), name: '告警' },
-                { value: computed(()=>data.maintenance), name: '维护' },
-                { value: computed(()=>data.construction), name: '施工' },
-                { value: computed(()=>data.outage), name: '停运' },
-                { value: computed(()=>data.other), name: '退役' }
+                { value: data.value.running, name: '运行' },
+                { value: data.value.fault, name: '告警' },
+                { value: data.value.maintenance, name: '维护' },
+                { value: data.value.construction, name: '施工' },
+                { value: data.value.outage, name: '停运' },
+                { value: data.value.other, name: '退役' }
             ]
         }
     ]
-});
+}));
 
 const initChart = () => {
     // 添加延时确保DOM已经渲染
@@ -100,15 +108,16 @@ const initChart = () => {
         if (!chart) return;
         
         chartInstance = echarts.init(chart);
-        chartInstance.setOption(option);
+        chartInstance.setOption(option.value);
         
         window.addEventListener('resize', handleResize);
     }, 0);
 }
 
+// 修改 updateChart 方法
 const updateChart = () => {
     if (chartInstance) {
-        chartInstance.setOption(option);
+        chartInstance.setOption(option.value);
     }
 }
 

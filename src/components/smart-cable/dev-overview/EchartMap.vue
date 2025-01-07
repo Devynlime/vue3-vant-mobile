@@ -3,7 +3,7 @@
         <div class="mapcontainer">
         </div>
         <div class="labelinfo">
-            <div>电缆井感知:<span>188套</span></div>
+            <div>电缆井感知:<span>277套</span></div>
             <div>有源视频监控:<span>2套</span></div>
             <div>无源视频监控:<span>2套</span></div>
         </div>

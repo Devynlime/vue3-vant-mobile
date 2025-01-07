@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router/auto'
+import { createRouter, createWebHashHistory } from 'vue-router/auto'
 import { handleHotUpdate, routes } from 'vue-router/auto-routes'
 
 import NProgress from 'nprogress'
@@ -12,7 +12,8 @@ import { isLogin } from '@/utils/auth'
 NProgress.configure({ showSpinner: true, parent: '#app' })
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.VITE_APP_PUBLIC_PATH),
+  history: createWebHashHistory(), // 使用hash模式[适配i国网平台]
+  // history: createWebHistory(import.meta.env.VITE_APP_PUBLIC_PATH), // 使用history模式[需要知道根路径]
   routes,
 })
 

@@ -46,33 +46,31 @@ export const getToken = (userName, userId, ticket, sm4key) => {
   });
 };
 
-const username = "admin";
-const password = "Cable@2024";
+// const username = "admin";
+// const password = "Cable@2024";
 
-export const mockLogin = () => {
-  login(username, password, "code", "uuid")
-    .then((res) => {
-      const data = res.data;
-      localStorage.setItem(GDE_TOKEN_KEY, data.access_token);
-      resolve();
-    })
-    .catch((error) => {
-      reject(error);
-    });
-};
+// export const mockLogin = () => {
+//   login(username, password, "code", "uuid")
+//     .then((res) => {
+//       const data = res.data;
+//       localStorage.setItem(GDE_TOKEN_KEY, data.access_token);
+//       resolve();
+//     })
+//     .catch((error) => {
+//       reject(error);
+//     });
+// };
 
 // refreshCableToken
 export async function refreshCableToken() {
   const userId = localStorage.getItem("userId") || "";
-  const sm4key = localStorage.getItem("sm4key") || "";
+  const sm4key = localStorage.getItem("sm4Key") || "";
   const wxcode = localStorage.getItem("wxcode") || "";
-  const tokenParams = { userName: "default", userId, ticket: wxcode, sm4key };
+  let tokenParams = { userName: "default", userId, ticket: wxcode, sm4key };
 
   try {
     // 从本地存储获取i国网用户信息
-    const username = JSON.parse(localStorage.getItem(IGW_USER_KEY)).user
-      .userName;
-    tokenParams.userName = username;
+    tokenParams.userName = igwMethods.getPWUserInfo().userAccount;
 
     // 调用微信SDK获取授权码
     // @ts-expect-error 这里需要使用微信的js-sdk
@@ -84,10 +82,14 @@ export async function refreshCableToken() {
       },
       (res) => {
         console.log("js获取code:", res);
+        if (res.code) {
+          tokenParams.ticket = res.code;
+          console.log("☞tokenParams.ticket:", tokenParams.ticket);
+        }
       }
     );
 
-    tokenParams.ticket = ticket;
+    // tokenParams.ticket = ticket;
   } catch (error) {
     console.error("重新获取电缆井token失败:", error);
   }
@@ -100,7 +102,12 @@ export async function refreshCableToken() {
     tokenParams.sm4key
   );
   if (result?.data?.access_token) {
+    const existingToken = localStorage.getItem(STORAGE_TOKEN_KEY);
+    if (existingToken) {
+      console.log("☞access_token 已经存在", existingToken);
+    }
     localStorage.setItem(STORAGE_TOKEN_KEY, result.data.access_token);
+    console.log("☞access_token 成功更新", result.data.access_token);
     return true;
   }
   return false;

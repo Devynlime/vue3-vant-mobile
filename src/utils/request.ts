@@ -75,7 +75,7 @@ function requestHandler(
     console.error('获取i国网token失败:', error)
   }
 
-  const cableToken = localStorage.getItem(STORAGE_TOKEN_KEY) // 从cookie中获取token
+  const cableToken = localStorage.getItem(STORAGE_TOKEN_KEY) // 从本地存储中获取token
   // 如果 token 存在
   // 让每个请求携带自定义 token, 请根据实际情况修改
   if (cableToken)

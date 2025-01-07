@@ -43,7 +43,7 @@
 <script setup>
 import * as echarts from 'echarts';
 import { onMounted, reactive, ref, onUnmounted, nextTick, watch } from 'vue';
-import { overviewStatistic } from '@/api/device-overview'
+import { substationStatistic } from '@/api/device-overview'
 
 // 1. 首先定义所有响应式数据
 // 左上数据
@@ -421,14 +421,251 @@ const updateLabels = () => {
     if (mapchart) {
         mapchart.setOption({
             graphic: [
-                // ... 更新标签配置 ...
-            ]
+                                // 左上标签
+                                {
+                                    type: 'group',
+                                    left: 20,
+                                    top: 0,
+                                    z: 100,
+                                    children: [{
+                                        type: 'rect',
+                                        shape: {
+                                            width: 160,
+                                            height: 65,
+                                            r: 8
+                                        },
+                                        style: {
+                                            fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
+                                                offset: 0,
+                                                color: '#18B495'
+                                            }, {
+                                                offset: 1,
+                                                color: '#16A085'
+                                            }]),
+                                            shadowBlur: 10,
+                                            shadowColor: 'rgba(0,0,0,0.2)',
+                                            shadowOffsetX: 2,
+                                            shadowOffsetY: 2,
+                                            borderRadius: 8
+                                        }
+                                    }, {
+                                        type: 'text',
+                                        style: {
+                                            rich: {
+                                                key: {
+                                                    fill: '#fff',
+                                                    fontSize: 12,
+                                                    fontWeight: 'normal'
+                                                },
+                                                value: {
+                                                    fill: '#FFD700',  // 金色
+                                                    fontSize: 14,
+                                                    fontWeight: 'bold',
+                                                    padding: [0, 4]  // 左右添加间距
+                                                },
+                                                unit: {
+                                                    fill: '#fff',
+                                                    fontSize: 12,
+                                                    padding: [0, 0, 0, 2]  // 左侧添加间距
+                                                }
+                                            },
+                                            text: [
+                                                '{key|220KV变电站:} {value|' + leftTopInfo.numStation + '}{unit|座}\n',
+                                                '{key|容量:} {value|' + leftTopInfo.capacity + '}{unit|MVA}'
+                                            ].join(''),
+                                            padding: [12, 15],
+                                            lineHeight: 20,
+                                            textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                                        }
+                                    }, {
+                                        // 添加装饰性图标或线条
+                                        type: 'rect',
+                                        shape: {
+                                            width: 3,
+                                            height: 30
+                                        },
+                                        position: [0, 17],
+                                        style: {
+                                            fill: '#fff',
+                                            borderRadius: 2
+                                        }
+                                    }],
+                                    // 添加鼠标悬停效果
+                                    onmouseover: function() {
+                                        this.children[0].style.shadowBlur = 20;
+                                        mapchart.setOption(option);
+                                    },
+                                    onmouseout: function() {
+                                        this.children[0].style.shadowBlur = 10;
+                                        mapchart.setOption(option);
+                                    }
+                                },
+                                // 右上标签
+                                {
+                                    type: 'group',
+                                    right: 20,
+                                    top: 0,
+                                    z: 100,
+                                    children: [{
+                                        type: 'rect',
+                                        shape: {
+                                            width: 160,
+                                            height: 65,
+                                            r: 8
+                                        },
+                                        style: {
+                                            fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
+                                                offset: 0,
+                                                color: '#18B495'
+                                            }, {
+                                                offset: 1,
+                                                color: '#16A085'
+                                            }]),
+                                            shadowBlur: 10,
+                                            shadowColor: 'rgba(0,0,0,0.2)',
+                                            shadowOffsetX: 2,
+                                            shadowOffsetY: 2,
+                                            borderRadius: 8
+                                        }
+                                    }, {
+                                        type: 'text',
+                                        style: {
+                                            rich: {
+                                                key: {
+                                                    fill: '#fff',
+                                                    fontSize: 12,
+                                                    fontWeight: 'normal'
+                                                },
+                                                value: {
+                                                    fill: '#FFD700',  // 金色
+                                                    fontSize: 14,
+                                                    fontWeight: 'bold',
+                                                    padding: [0, 4]  // 左右添加间距
+                                                },
+                                                unit: {
+                                                    fill: '#fff',
+                                                    fontSize: 12,
+                                                    padding: [0, 0, 0, 2]  // 左侧添加间距
+                                                }
+                                            },  
+                                            text: [ 
+                                                '{key|110KV变电站:} {value|' + rightTopInfo.numStation + '}{unit|座}\n',
+                                                '{key|容量:} {value|' + rightTopInfo.capacity + '}{unit|MVA}'
+                                            ].join(''),
+                                            padding: [12, 15],
+                                            lineHeight: 20,
+                                            textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                                        }
+                                    }, {
+                                        // 添加装饰性图标或线条
+                                        type: 'rect',
+                                        shape: {
+                                            width: 3,
+                                            height: 30
+                                        },
+                                        position: [0, 17],
+                                        style: {
+                                            fill: '#fff',
+                                            borderRadius: 2
+                                        }
+                                    }],
+                                    // 添加鼠标悬停效果
+                                    onmouseover: function() {
+                                        this.children[0].style.shadowBlur = 20;
+                                        mapchart.setOption(option);
+                                    },
+                                    onmouseout: function() {
+                                        this.children[0].style.shadowBlur = 10;
+                                        mapchart.setOption(option);
+                                    }
+                                },
+                                // 左下标签
+                                {
+                                    type: 'group',
+                                    left: 20,
+                                    bottom: 0,
+                                    z: 100,
+                                    children: [{
+                                        type: 'rect',
+                                        shape: {
+                                            width: 160,
+                                            height: 65,
+                                            r: 8
+                                        },
+                                        style: {
+                                            fill: new echarts.graphic.LinearGradient(0, 0, 1, 1, [{
+                                                offset: 0,
+                                                color: '#18B495'
+                                            }, {
+                                                offset: 1,
+                                                color: '#16A085'
+                                            }]),
+                                            shadowBlur: 10,
+                                            shadowColor: 'rgba(0,0,0,0.2)',
+                                            shadowOffsetX: 2,
+                                            shadowOffsetY: 2,
+                                            borderRadius: 8
+                                        }
+                                    }, {
+                                        type: 'text',
+                                        style: {
+                                            rich: {
+                                                key: {
+                                                    fill: '#fff',
+                                                    fontSize: 12,
+                                                    fontWeight: 'normal'
+                                                },
+                                                value: {  
+                                                    fill: '#FFD700',  // 金色
+                                                    fontSize: 14,
+                                                    fontWeight: 'bold',
+                                                    padding: [0, 4]  // 左右添加间距
+                                                },
+                                                unit: {
+                                                    fill: '#fff',
+                                                    fontSize: 12,
+                                                    padding: [0, 0, 0, 2]  // 左侧添加间距
+                                                }
+                                            },
+                                            text: [
+                                                '{key|35KV变电站:} {value|' + leftBottomInfo.numStation + '}{unit|座}\n',
+                                                '{key|容量:} {value|' + leftBottomInfo.capacity + '}{unit|MVA}'
+                                            ].join(''),
+                                            padding: [12, 15],
+                                            lineHeight: 20,
+                                            textShadow: '1px 1px 2px rgba(0,0,0,0.2)'
+                                        }
+                                    }, {
+                                        // 添加装饰性图标或线条
+                                        type: 'rect',
+                                        shape: {
+                                            width: 3,
+                                            height: 30
+                                        },
+                                        position: [0, 17],
+                                        style: {
+                                            fill: '#fff',
+                                            borderRadius: 2
+                                        }
+                                    }],
+                                    // 添加鼠标悬停效果
+                                    onmouseover: function() {
+                                        this.children[0].style.shadowBlur = 20;
+                                        mapchart.setOption(option);
+                                    },
+                                    onmouseout: function() {
+                                        this.children[0].style.shadowBlur = 10;
+                                        mapchart.setOption(option);
+                                    }
+                                }
+                            ],
         });
     }
 }
 
 // 监听数据变化
 watch([leftTopInfo, rightTopInfo, leftBottomInfo], () => {
+    console.log('数据变化，更新标签')
     updateLabels();
 });
 
@@ -447,24 +684,27 @@ onMounted(() => {
 // 获取数据
 const getSubstations = async () => {
     try {
-        const res = await overviewStatistic()
-        const substationGroup = res?.data?.substationGroup || {
-            "220KV": 0,
-            "110KV": 0,
-            "35KV": 0
+        const res = await substationStatistic()
+        // 解析数据
+        const resVoltageLevel = res?.data?.voltageLevel || {}
+        
+        const substationGroup = {
+            "220KV": resVoltageLevel.find(item => item.voltageLevelName === "交流220kV") || {},
+            "110KV": resVoltageLevel.find(item => item.voltageLevelName === "交流110kV") || {},
+            "35KV": resVoltageLevel.find(item => item.voltageLevelName === "交流35kV") || {}
         }
 
         Object.assign(leftTopInfo, {
-            numStation: substationGroup["220KV"] || 0,
-            capacity: (substationGroup["220KV"] || 0) * 240
+            numStation: substationGroup["220KV"]?.total || 0,
+            capacity: substationGroup["220KV"]?.stationCapacity || 0
         })
         Object.assign(rightTopInfo, {
-            numStation: substationGroup["110KV"] || 0,
-            capacity: (substationGroup["110KV"] || 0) * 120
+            numStation: substationGroup["110KV"]?.total || 0,
+            capacity: substationGroup["110KV"]?.stationCapacity || 0
         })
         Object.assign(leftBottomInfo, {
-            numStation: substationGroup["35KV"] || 0,
-            capacity: (substationGroup["35KV"] || 0) * 25
+            numStation: substationGroup["35KV"]?.total || 0,
+            capacity: substationGroup["35KV"]?.stationCapacity || 0
         })
 
         bianDianTotalCapacity.value = leftTopInfo.capacity + rightTopInfo.capacity + leftBottomInfo.capacity
